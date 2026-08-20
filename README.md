@@ -1,6 +1,8 @@
 # ScheduleSnap
 A web application that helps groups find the best time to meet: not just a time that technically works.
 
+[https://schedule-snap.pages.dev/](https://schedule-snap.pages.dev/)
+
 ## Key Features
 
 These are what differentiates ScheduleSnap from other scheduling tools:

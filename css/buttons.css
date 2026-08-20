@@ -17,3 +17,13 @@
 .button-primary:hover {
     background-color: var(--primary-color-hover);
 }
+
+.button-secondary {
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.button-secondary:hover {
+    background-color: var(--primary-color-light);
+}

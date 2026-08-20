@@ -3,7 +3,7 @@ const footer = document.querySelector('footer');
 
 header.innerHTML = `
     <nav>
-        <a href="/index.html" class="brand-container">
+        <a href="/" class="brand-container">
             <img class="brand-logo" src="/assets/logos/logo.png" alt="ScheduleSnap">
             <div class="brand-text"><span class="brand-text-primary">Schedule</span><span class="brand-text-secondary">Snap</span></div>
         </a>
@@ -12,7 +12,7 @@ header.innerHTML = `
             <li><a href="/how-it-works">How It Works</a></li>
             <li><a href="/features">Features</a></li>
         </ul>
-        <a href="/get-started" class="button button-primary">Get Started</a>
+        <a href="/app/" class="button button-primary">Open App</a>
     </nav>
 `;
 

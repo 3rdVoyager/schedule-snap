@@ -3,6 +3,7 @@ header {
     padding: var(--nav-padding);
     border-right: 2px solid var(--border-color);
     width: 20vw;
+    min-width: 275px;
 }
 
 nav {
@@ -38,12 +39,4 @@ nav ul li a {
     border-radius: 10px;
     width: 100%;
     transition: background-color 0.3s ease;
-}
-
-nav ul li a:hover {
-    background-color: var(--primary-color-light);
-}
-
-nav ul li a.active {
-    background-color: var(--primary-color);
 }
