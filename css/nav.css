@@ -1,7 +1,7 @@
 header {
     background-color: var(--header-bg-color);
     padding: var(--nav-padding);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
 }
 
 nav {
@@ -54,7 +54,7 @@ nav ul li a.active::after {
 footer {
     padding: var(--nav-padding);
     background-color: var(--footer-bg-color);
-    border-top: 1px solid var(--border-color);
+    border-top: 2px solid var(--border-color);
 }
 
 .footer-description {
