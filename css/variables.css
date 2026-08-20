@@ -1,0 +1,30 @@
+:root {
+    --brand-color-green: #14B8A6;
+    --brand-color-yellow: #FACC15;
+    --brand-color-white: #E3E3E3;
+
+    --primary-color: var(--brand-color-green);
+    --primary-color-hover: #0F9989;
+    --secondary-color: var(--brand-color-yellow);
+    --secondary-color-hover: #dfb40a;
+    --tertiary-color: var(--brand-color-white);
+    --tertiary-color-hover: #afafaf;
+
+    --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+    --site-bg-color: #FAFAFA;
+    --header-bg-color: #ecfffb;
+    --footer-bg-color: #ecfffb;
+    --border-color: #777777;
+
+    --text-color-dark: #000000;
+    --text-color-light: #595959;
+    --text-size-small: 14px;
+    --text-size-medium: 16px;
+    --text-size-large: 18px;
+
+    --button-border-radius: 10px;
+    --button-text-color: #FFFFFF;
+
+    --nav-padding: 20px;
+}

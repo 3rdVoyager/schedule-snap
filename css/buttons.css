@@ -1,0 +1,19 @@
+.button {
+    display: inline-block;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--button-text-color);
+    padding: 10px 20px;
+    border-radius: var(--button-border-radius);
+    transition: background-color 0.3s ease;
+}
+
+.button-primary {
+    background-color: var(--primary-color);
+}
+
+.button-primary:hover {
+    background-color: var(--primary-color-hover);
+}
