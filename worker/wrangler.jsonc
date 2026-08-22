@@ -1,0 +1,12 @@
+{
+  "name": "schedule-snap-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-21",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "schedule-snap-db",
+      "database_id": "20bac99e-cf51-4ce8-b82e-c29d80aa822b"
+    }
+  ]
+}
