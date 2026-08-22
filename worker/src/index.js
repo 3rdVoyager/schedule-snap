@@ -12,6 +12,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
+    const segments = path.split("/"); // "/api/events/27473282" → ["", "api", "events", "27473282"]
 
     // CORS preflight check
     if (request.method === "OPTIONS") {
@@ -19,7 +20,11 @@ export default {
     }
 
     // Create event
-    if (path === "/api/events" && request.method === "POST") {
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      request.method === "POST"
+    ) {
       // Validate body
       let body;
       try {
@@ -56,6 +61,31 @@ export default {
         .run();
 
       return json({ id, joinCode, manageToken }, 201);
+    }
+
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] &&
+      request.method === "GET"
+    ) {
+      const code = segments[3];
+      const event = await env.DB.prepare(
+        "SELECT * FROM events WHERE join_code = ?",
+      )
+        .bind(code)
+        .first();
+      if (event === null) {
+        return json({ error: "Event not found" }, 404);
+      }
+      return json({
+        id: event.id,
+        joinCode: event.join_code,
+        title: event.title,
+        settings: event.settings,
+        createdAt: event.created_at,
+        updatedAt: event.updated_at,
+      });
     }
 
     return json({ message: "Not found" }, 404);
