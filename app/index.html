@@ -61,7 +61,10 @@
         </fieldset>
         <fieldset>
           <legend>What timezone is the event in?</legend>
-          <p>This is the timezone of the event. This is used to convert all responses to the event's timezone.</p>
+          <p>
+            This is the timezone of the event. This is used to convert all
+            responses to the event's timezone.
+          </p>
           <label for="timezone">Timezone</label>
           <select id="timezone" name="timezone">
             <option value="Pacific/Pago_Pago">UTC-11 — Samoa</option>
@@ -97,7 +100,11 @@
         </fieldset>
         <fieldset>
           <legend>When can participants schedule their availability?</legend>
-          <p>These are the time windows in which respondents can add their availability. Think of this as the windows of possible times the event could be scheduled.</p>
+          <p>
+            These are the time windows in which respondents can add their
+            availability. Think of this as the windows of possible times the
+            event could be scheduled.
+          </p>
           <div id="scheduling-windows">
             <div class="scheduling-window-row">
               <input
@@ -119,6 +126,31 @@
         <!-- Future: responseWindow, allowResponseEdits, resultsVisibleToParticipants -->
         <button type="submit">Create Event</button>
       </form>
+      <!-- Hidden Success Message -->
+      <div id="create-success" hidden>
+        <h2>Event created</h2>
+
+        <section>
+          <h3>Share with participants</h3>
+          <p>Join code: <strong id="join-code"></strong></p>
+          <label for="join-link">Participant link</label>
+          <input type="text" id="join-link" readonly />
+          <button type="button" id="copy-join-link">Copy link</button>
+        </section>
+
+        <section>
+          <h3>Save your organizer link</h3>
+          <p>
+            Anyone with this link can view responses and edit the event. Save it
+            somewhere safe — we only show it once.
+          </p>
+          <label for="organizer-link">Organizer link</label>
+          <input type="text" id="organizer-link" readonly />
+          <button type="button" id="copy-organizer-link">
+            Copy organizer link
+          </button>
+        </section>
+      </div>
     </main>
     <footer></footer>
   </body>

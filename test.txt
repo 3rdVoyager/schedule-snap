@@ -1,0 +1,5 @@
+document.querySelector("#title").value = "Team Meeting";
+document.querySelector("#description").value = "Team Meeting Description";
+document.querySelector(".scheduling-window-start").value = "2026-09-01T09:00";
+document.querySelector(".scheduling-window-end").value = "2026-09-01T17:00";
+document.querySelector("#create-event-form").requestSubmit();
