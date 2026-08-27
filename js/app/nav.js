@@ -8,7 +8,7 @@ header.innerHTML = `
         </a>
         <ul>
             <li><a href="/app/">Create Event</a></li>
-            <li><a href="/app/join/">Join with Code</a></li>
+            <li><a href="/app/respond/">Respond with code</a></li>
         </ul>
     </nav>
 `;

@@ -1,42 +1,44 @@
 import { API_URL } from "./config.js";
 import { formatInZone, zonedToUtcIso } from "./time.js";
 
-const codeForm = document.querySelector("#join-form");
-const statusEl = document.querySelector("#join-status");
+const eventCodeForm = document.querySelector("#event-code-form");
+const statusEl = document.querySelector("#respond-status");
 const view = document.querySelector("#event-view");
 const responseForm = document.querySelector("#response-form");
-const code = codeFromUrl();
+const eventCodeFromUrl = codeFromUrl();
 let currentEvent = null;
-let currentCode = code.length === 8 ? code : "";
+let currentEventCode = eventCodeFromUrl.length === 8 ? eventCodeFromUrl : "";
 
-if (code.length === 8) {
-  loadEvent(code);
+if (eventCodeFromUrl.length === 8) {
+  loadEvent(eventCodeFromUrl);
 }
 
-function normalizeCode(raw) {
+function normalizeEventCode(raw) {
   return String(raw ?? "")
     .replace(/\D/g, "")
     .slice(0, 8);
 }
 
 function codeFromUrl() {
-  return normalizeCode(new URLSearchParams(window.location.search).get("code"));
+  return normalizeEventCode(
+    new URLSearchParams(window.location.search).get("code"),
+  );
 }
 
-codeForm.addEventListener("submit", (e) => {
+eventCodeForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const code = normalizeCode(e.target.code.value);
-  if (code) {
+  const eventCode = normalizeEventCode(e.target.code.value);
+  if (eventCode) {
     const url = new URL(window.location.href);
-    url.searchParams.set("code", code);
+    url.searchParams.set("code", eventCode);
     history.replaceState(null, "", url);
-    loadEvent(code);
+    loadEvent(eventCode);
   }
 });
 
 responseForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (!currentEvent || !currentCode) return;
+  if (!currentEvent || !currentEventCode) return;
   const displayName = document
     .querySelector("#display-name-input")
     .value.trim();
@@ -67,20 +69,20 @@ responseForm.addEventListener("submit", (e) => {
   console.log(payload);
 });
 
-async function loadEvent(code) {
+async function loadEvent(eventCode) {
   statusEl.hidden = false;
   statusEl.textContent = "Loading…";
   view.hidden = true;
 
   try {
-    const response = await fetch(`${API_URL}/api/events/${code}`);
+    const response = await fetch(`${API_URL}/api/events/${eventCode}`);
     const data = await response.json();
     if (!response.ok) {
       statusEl.textContent = data.error ?? "Could not load event";
       return;
     }
     currentEvent = data;
-    currentCode = code;
+    currentEventCode = eventCode;
     statusEl.hidden = true;
     renderEvent(data);
   } catch {
@@ -108,7 +110,7 @@ function renderEvent(data) {
   }
 
   view.hidden = false;
-  codeForm.hidden = true;
+  eventCodeForm.hidden = true;
   responseForm.hidden = false;
 }
 

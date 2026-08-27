@@ -10,7 +10,7 @@ All requests and responses are JSON. Errors are always
 
 | Capability | Granted by |
 |------------|-----------|
-| View event, submit/edit response | Join code (8 digits) |
+| View event, submit/edit response | Event code (8 digits) |
 | Organizer actions (edit, all responses, recommendations) | Manage token (`Authorization: Bearer <manageToken>`) |
 
 The manage token is returned exactly once — at event creation — and stored in
@@ -21,17 +21,17 @@ included in any other API response.
 
 | Audience | URL | Notes |
 |----------|-----|-------|
-| Participant | `/app/join/?code={joinCode}` | Public share link |
-| Organizer | `/app/manage/?code={joinCode}#token={manageToken}` | Secret capability link |
+| Participant | `/app/respond/?code={eventCode}` | Public share link |
+| Organizer | `/app/manage/?code={eventCode}#token={manageToken}` | Secret capability link |
 
-- **Join code** in the query string identifies which event to load (participant
+- **Event code** in the query string identifies which event to load (participant
   view or manage page shell).
 - **Manage token** lives in the URL **hash** (`#token=...`) so it is not sent to
   the static host on page load. The manage page reads it client-side and sends
   it as a `Bearer` token on API calls.
-- Authorization is enforced by the **token alone**; the join code in manage URLs
+- Authorization is enforced by the **token alone**; the event code in manage URLs
   is for routing and UX. The worker verifies that the token belongs to the event
-  with that join code.
+  with that event code.
 
 ## Core data format: time ranges
 
@@ -100,25 +100,25 @@ JSON in `events.settings` (there is no separate `description` column in v1).
 Response `201` (only time the manage token is sent):
 
 ```json
-{ "id": "uuid", "joinCode": "27473282", "manageToken": "32-hex-chars" }
+{ "id": "uuid", "eventCode": "27473282", "manageToken": "32-hex-chars" }
 ```
 
-The frontend uses `joinCode` and `manageToken` to build participant and
+The frontend uses `eventCode` and `manageToken` to build participant and
 organizer links (see [Frontend links](#frontend-links)). `id` is stored in
 `localStorage` for manage-token lookup.
 
 Errors: `400` invalid JSON / validation failure.
 
-### Get event by join code — `GET /api/events/:code`
+### Get event by event code — `GET /api/events/:eventCode`
 
-`:code` is the 8-digit join code (digits only, no dashes).
+`:eventCode` is the 8-digit event code (digits only, no dashes).
 
 No auth beyond the code itself. Response `200`:
 
 ```json
 {
   "id": "uuid",
-  "joinCode": "27473282",
+  "eventCode": "27473282",
   "title": "Team sync",
   "description": "Quarterly planning",
   "settings": {
@@ -139,29 +139,50 @@ level for convenience. `settings` in the response omits `description`.
 
 Errors: `404` unknown code. Never includes `manageToken`.
 
+### Submit response — `POST /api/events/:eventCode/responses`
+
+Request body:
+
+```json
+{
+  "displayName": "Alex",
+  "availability": [
+    { "start": "2026-09-01T14:00:00.000Z", "end": "2026-09-01T16:00:00.000Z" }
+  ],
+  "preferences": null
+}
+```
+
+Response `201`:
+
+```json
+{ "id": "uuid" }
+```
+
+Errors: `400` validation failure; `404` unknown event code.
+
 ### Planned (not yet built)
 
 #### Participant responses
 
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /api/events/:code/responses` | Participant submits availability + preferences |
-| `PUT /api/events/:code/responses/:responseId` | Participant edits their response |
+| `PUT /api/events/:eventCode/responses/:responseId` | Participant edits their response |
 
 #### Organizer (manage token required)
 
-All manage endpoints use the join code in the path and the manage token in the
+All manage endpoints use the event code in the path and the manage token in the
 `Authorization` header. The worker resolves the event with:
 
 ```sql
-SELECT * FROM events WHERE join_code = ? AND manage_token = ?
+SELECT * FROM events WHERE event_code = ? AND manage_token = ?
 ```
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /api/events/:code/manage` | Organizer view — event + all responses |
-| `PUT /api/events/:code/manage` | Organizer edits settings / closes event |
-| `GET /api/events/:code/manage/recommendations` | Run scheduling algorithm |
+| `GET /api/events/:eventCode/manage` | Organizer view — event + all responses |
+| `PUT /api/events/:eventCode/manage` | Organizer edits settings / closes event |
+| `GET /api/events/:eventCode/manage/recommendations` | Run scheduling algorithm |
 
 Example request:
 
@@ -173,12 +194,12 @@ Authorization: Bearer c0ca6e79244bd6c9675eff2e741d94b3
 Errors: `401` missing or invalid token; `404` unknown code or token does not
 match that event.
 
-Planned `GET /api/events/:code/manage` response `200`:
+Planned `GET /api/events/:eventCode/manage` response `200`:
 
 ```json
 {
   "id": "uuid",
-  "joinCode": "27473282",
+  "eventCode": "27473282",
   "title": "Team sync",
   "description": "Quarterly planning",
   "settings": { "...": "..." },

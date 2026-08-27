@@ -9,7 +9,7 @@ Lightweight auth split: **participants stay accountless**; **organizers use emai
 | **Organizer** | Create/manage polls, view all responses, run scheduling | Yes (email + password) |
 | **Participant** | View poll, submit/edit own availability & preferences | No |
 
-Poll codes grant **join-only** access. They never grant organizer/admin actions.
+Event codes grant **participant-only** access. They never grant organizer/admin actions.
 
 ## Organizer: Workspace Login
 
@@ -25,19 +25,19 @@ Organizers register with **email + user-chosen password** to access their worksp
 
 No automated forgot-password flow in v1. UI should state clearly that passwords cannot be reset automatically without being already logged in. Optional manual reset by project maintainer — not a guaranteed feature.
 
-## Participant: Poll Codes (Meet-style)
+## Participant: Event codes (Meet-style)
 
-Each poll gets a short **join code** for sharing. Participants can:
+Each poll gets a short **event code** for sharing. Participants can:
 
 1. Open a direct link with the code embedded, or
-2. Visit a universal **`/join`** page, enter the code, and land on that poll
+2. Visit a universal **`/respond`** page, enter the code, and land on that poll
 
 ### Code format
 
 **Numeric only** 8 digits, formatted for readability (e.g. `482-910-73`).
 
 - No ambiguous characters; easy to read aloud and type on a phone
-- ~100M combinations — sufficient for join-only access with rate limiting
+- ~100M combinations — sufficient for participant-only access with rate limiting
 - Matches the Google Meet mental model
 
 - Generated server-side; checked for uniqueness before assignment
@@ -70,10 +70,10 @@ Poll admin/edit    → workspace session only (never poll code alone)
 - **Frontend:** Cloudflare Pages
 - **API + auth:** Cloudflare Workers
 - **Persistent data:** Cloudflare D1 (schema defined separately)
-- Session cookies set by Worker; poll code validation on join/respond endpoints
+- Session cookies set by Worker; event code validation on respond endpoints
 
 ## UX Summary
 
 **Organizer:** sign up once → log in on any device → dashboard with all polls.
 
-**Participant:** receive link or code → join → respond. No signup.
+**Participant:** receive link or code → respond. No signup.

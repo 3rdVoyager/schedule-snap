@@ -61,7 +61,9 @@ function validateSettings(rawSettings) {
 
   const schedulingWindows = rawSettings.schedulingWindows;
   if (!Array.isArray(schedulingWindows) || schedulingWindows.length === 0) {
-    return { error: "settings.schedulingWindows must have at least one window" };
+    return {
+      error: "settings.schedulingWindows must have at least one window",
+    };
   }
 
   for (let i = 0; i < schedulingWindows.length; i++) {
@@ -90,10 +92,16 @@ function validateSettings(rawSettings) {
       : parseUtcInstant(responseWindow.closesAt);
 
   if (responseWindow.opensAt !== null && !opensAt) {
-    return { error: "settings.responseWindow.opensAt must be null or a UTC ISO timestamp" };
+    return {
+      error:
+        "settings.responseWindow.opensAt must be null or a UTC ISO timestamp",
+    };
   }
   if (responseWindow.closesAt !== null && !closesAt) {
-    return { error: "settings.responseWindow.closesAt must be null or a UTC ISO timestamp" };
+    return {
+      error:
+        "settings.responseWindow.closesAt must be null or a UTC ISO timestamp",
+    };
   }
   if (opensAt && closesAt && closesAt <= opensAt) {
     return { error: "settings.responseWindow.closesAt must be after opensAt" };
@@ -145,6 +153,22 @@ function publicSettings(stored) {
   return settings;
 }
 
+function validateAvailability(raw) {
+  if (!Array.isArray(raw)) {
+    return { error: "availability must be an array" };
+  }
+  const availability = [];
+  for (let i = 0; i < raw.length; i++) {
+    const rangeError = validateTimeRange(raw[i], `availability[${i}]`);
+    if (rangeError) return { error: rangeError };
+    availability.push({
+      start: raw[i].start,
+      end: raw[i].end,
+    });
+  }
+  return { availability };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -160,6 +184,7 @@ export default {
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
+      !segments[3] &&
       request.method === "POST"
     ) {
       let body;
@@ -185,7 +210,7 @@ export default {
       const id = crypto.randomUUID();
 
       const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
-      const joinCode = String(randomNumber % 100_000_000).padStart(8, "0");
+      const eventCode = String(randomNumber % 100_000_000).padStart(8, "0");
 
       const tokenBytes = crypto.getRandomValues(new Uint8Array(16));
       const manageToken = [...tokenBytes]
@@ -200,12 +225,12 @@ export default {
       const now = new Date().toISOString();
 
       await env.DB.prepare(
-        "INSERT INTO events (id, join_code, manage_token, title, settings, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO events (id, event_code, manage_token, title, settings, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
       )
-        .bind(id, joinCode, manageToken, title, settingsToStore, now, now)
+        .bind(id, eventCode, manageToken, title, settingsToStore, now, now)
         .run();
 
-      return json({ id, joinCode, manageToken }, 201);
+      return json({ id, eventCode, manageToken }, 201);
     }
 
     if (
@@ -214,11 +239,11 @@ export default {
       segments[3] &&
       request.method === "GET"
     ) {
-      const code = segments[3];
+      const eventCode = segments[3];
       const event = await env.DB.prepare(
-        "SELECT * FROM events WHERE join_code = ?",
+        "SELECT * FROM events WHERE event_code = ?",
       )
-        .bind(code)
+        .bind(eventCode)
         .first();
       if (event === null) {
         return json({ error: "Event not found" }, 404);
@@ -228,7 +253,7 @@ export default {
 
       return json({
         id: event.id,
-        joinCode: event.join_code,
+        eventCode: event.event_code,
         title: event.title,
         description:
           typeof stored.description === "string" ? stored.description : "",
@@ -238,6 +263,60 @@ export default {
       });
     }
 
+    // Response form processing
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] &&
+      segments[4] === "responses" &&
+      request.method === "POST"
+    ) {
+      const eventCode = segments[3];
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Body must be valid JSON" }, 400);
+      }
+      const event = await env.DB.prepare(
+        "SELECT * FROM events WHERE event_code = ?",
+      )
+        .bind(eventCode)
+        .first();
+      if (event === null) {
+        return json({ error: "Event not found" }, 404);
+      }
+      const displayName =
+        typeof body.displayName === "string" ? body.displayName.trim() : "";
+      if (displayName.length === 0) {
+        return json({ error: "displayName is required" }, 400);
+      }
+      const availability = body.availability;
+      if (!Array.isArray(availability)) {
+        return json({ error: "availability must be an array" }, 400);
+      }
+
+      const validated = validateAvailability(availability);
+      if (validated.error) {
+        return json({ error: validated.error }, 400);
+      }
+
+      const now = new Date().toISOString();
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        "INSERT INTO responses (id, event_id, display_name, availability, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+      )
+        .bind(
+          id,
+          event.id,
+          displayName,
+          JSON.stringify(validated.availability),
+          now,
+          now,
+        )
+        .run();
+      return json({ id }, 201);
+    }
     return json({ message: "Not found" }, 404);
   },
 };

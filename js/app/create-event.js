@@ -20,7 +20,7 @@ function copyInputValue(inputId, buttonId) {
     await navigator.clipboard.writeText(input.value);
   });
 }
-copyInputValue("#join-link", "#copy-join-link");
+copyInputValue("#respond-link", "#copy-respond-link");
 copyInputValue("#organizer-link", "#copy-organizer-link");
 
 createEventForm.addEventListener("submit", async (event) => {
@@ -71,14 +71,14 @@ createEventForm.addEventListener("submit", async (event) => {
 
     localStorage.setItem(`manageToken:${data.id}`, data.manageToken);
 
-    const joinUrl = `${window.location.origin}/app/join/?code=${data.joinCode}`;
-    const manageUrl = `${window.location.origin}/app/manage/?code=${data.joinCode}#token=${data.manageToken}`;
+    const respondUrl = `${window.location.origin}/app/respond/?code=${data.eventCode}`;
+    const manageUrl = `${window.location.origin}/app/manage/?code=${data.eventCode}#token=${data.manageToken}`;
 
     document.querySelector("#create-event-form").hidden = true;
 
     const success = document.querySelector("#create-success");
-    document.querySelector("#join-code").textContent = data.joinCode;
-    document.querySelector("#join-link").value = joinUrl;
+    document.querySelector("#event-code").textContent = data.eventCode;
+    document.querySelector("#respond-link").value = respondUrl;
     document.querySelector("#organizer-link").value = manageUrl;
     success.hidden = false;
   } catch (error) {
