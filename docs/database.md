@@ -46,6 +46,6 @@ receives one at event creation.
 |--------|----------|
 | Create event | Generate id + join_code + manage_token → INSERT with unique check on join_code |
 | Join event | SELECT * FROM events WHERE join_code = ? |
-| Organizer action | SELECT * FROM events WHERE id = ? AND manage_token = ? |
+| Organizer action | SELECT * FROM events WHERE join_code = ? AND manage_token = ? |
 | Submit response | INSERT or UPDATE responses |
 | Recommend times | SELECT * FROM responses WHERE event_id = ? → run algo in Worker |
