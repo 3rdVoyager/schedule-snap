@@ -78,8 +78,8 @@ createEventForm.addEventListener("submit", async (event) => {
     localStorage.setItem(`manageToken:${data.id}`, data.manageToken);
 
     // Build join and manage URLs
-    const joinUrl = `${window.location.origin}/app/e/${data.joinCode}`;
-    const manageUrl = `${joinUrl}/manage#token=${data.manageToken}`;
+    const joinUrl = `${window.location.origin}/app/join/?code=${data.joinCode}`;
+    const manageUrl = `${window.location.origin}/app/manage/?code=${data.joinCode}#token=${data.manageToken}`;
 
     // Hide create event form and show success message
     document.querySelector("#create-event-form").hidden = true;

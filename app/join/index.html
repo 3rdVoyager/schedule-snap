@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join Event | ScheduleSnap</title>
+    <link rel="stylesheet" href="/css/app/main.css" />
+    <script src="/js/app/nav.js" defer></script>
+    <script src="/js/app/join-event.js" defer></script>
+    <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/logos/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/logos/favicon-16x16.png"
+    />
+    <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/logos/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <form id="join-form">
+        <label for="join-code-input">Join code</label>
+        <input
+          id="join-code-input"
+          name="code"
+          inputmode="numeric"
+          maxlength="11"
+          autocomplete="off"
+        />
+        <button type="submit">Join</button>
+      </form>
+      <p id="join-status" hidden></p>
+      <article id="event-view" hidden>
+        <h1 id="event-title"></h1>
+        <p id="event-description"></p>
+        <p id="event-meta"></p>
+        <ul id="event-windows"></ul>
+      </article>
+    </main>
+  </body>
+</html>
