@@ -6,7 +6,7 @@
     <title>Join Event | ScheduleSnap</title>
     <link rel="stylesheet" href="/css/app/main.css" />
     <script src="/js/app/nav.js" defer></script>
-    <script src="/js/app/join-event.js" defer></script>
+    <script type="module" src="/js/app/join-event.js"></script>
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
     <link
       rel="icon"
@@ -50,6 +50,30 @@
         <p id="event-meta"></p>
         <ul id="event-windows"></ul>
       </article>
+      <form id="response-form" hidden>
+        <fieldset>
+          <legend>Your details</legend>
+          <label for="display-name-input">Display name</label>
+          <input id="display-name-input" name="displayName" placeholder="Display name" required/>
+        </fieldset>
+        <fieldset>
+          <legend>When are you available?</legend>
+          <p>
+            Select the time windows you are available.
+          </p>
+          <div id="availability-windows">
+            <div class="availability-window-row">
+              <input type="datetime-local" class="availability-window-start" aria-label="Availability window start" />
+              <input type="datetime-local" class="availability-window-end" aria-label="Availability window end" />
+              <input type="number" class="availability-window-preference" aria-label="Availability window preference" min="1" max="5" />
+            </div>
+          </div>
+          <button type="button" id="add-availability-window">
+            + Add availability window
+          </button>
+        </fieldset>
+        <button type="submit">Submit</button>
+      </form>
     </main>
   </body>
 </html>

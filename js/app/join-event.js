@@ -1,9 +1,13 @@
-const API_URL = "http://localhost:8787";
+import { API_URL } from "./config.js";
+import { formatInZone, zonedToUtcIso } from "./time.js";
 
-const form = document.querySelector("#join-form");
+const codeForm = document.querySelector("#join-form");
 const statusEl = document.querySelector("#join-status");
 const view = document.querySelector("#event-view");
+const responseForm = document.querySelector("#response-form");
 const code = codeFromUrl();
+let currentEvent = null;
+let currentCode = code.length === 8 ? code : "";
 
 if (code.length === 8) {
   loadEvent(code);
@@ -19,7 +23,7 @@ function codeFromUrl() {
   return normalizeCode(new URLSearchParams(window.location.search).get("code"));
 }
 
-form.addEventListener("submit", (e) => {
+codeForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const code = normalizeCode(e.target.code.value);
   if (code) {
@@ -28,6 +32,39 @@ form.addEventListener("submit", (e) => {
     history.replaceState(null, "", url);
     loadEvent(code);
   }
+});
+
+responseForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!currentEvent || !currentCode) return;
+  const displayName = document
+    .querySelector("#display-name-input")
+    .value.trim();
+  const timezone = currentEvent.settings.timezone;
+  const availability = [
+    ...document.querySelectorAll(
+      "#availability-windows .availability-window-row",
+    ),
+  ]
+    .map((row) => ({
+      start: row.querySelector(".availability-window-start").value,
+      end: row.querySelector(".availability-window-end").value,
+      preference: Number(
+        row.querySelector(".availability-window-preference").value,
+      ),
+    }))
+    .filter((w) => w.start && w.end)
+    .map((w) => ({
+      start: zonedToUtcIso(w.start, timezone),
+      end: zonedToUtcIso(w.end, timezone),
+      preference: w.preference,
+    }));
+  const payload = {
+    displayName,
+    availability: availability.map(({ start, end }) => ({ start, end })),
+    preferences: null,
+  };
+  console.log(payload);
 });
 
 async function loadEvent(code) {
@@ -42,19 +79,13 @@ async function loadEvent(code) {
       statusEl.textContent = data.error ?? "Could not load event";
       return;
     }
+    currentEvent = data;
+    currentCode = code;
     statusEl.hidden = true;
     renderEvent(data);
   } catch {
     statusEl.textContent = "Could not reach the server";
   }
-}
-
-function formatInZone(iso, tz) {
-  return new Intl.DateTimeFormat(undefined, {
-    timeZone: tz,
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(iso));
 }
 
 function renderEvent(data) {
@@ -77,5 +108,17 @@ function renderEvent(data) {
   }
 
   view.hidden = false;
-  form.hidden = true;
+  codeForm.hidden = true;
+  responseForm.hidden = false;
 }
+
+document
+  .querySelector("#add-availability-window")
+  .addEventListener("click", () => {
+    const template = document.querySelector(
+      "#availability-windows .availability-window-row",
+    );
+    const clone = template.cloneNode(true);
+    clone.querySelectorAll("input").forEach((input) => (input.value = ""));
+    document.querySelector("#availability-windows").appendChild(clone);
+  });
