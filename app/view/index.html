@@ -22,6 +22,27 @@
   <body>
     <header></header>
     <main>
+      <form id="event-code-form">
+        <label for="event-code-input">Event code</label>
+        <input
+          id="event-code-input"
+          name="code"
+          inputmode="numeric"
+          maxlength="11"
+          autocomplete="off"
+        />
+        <button type="submit" class="button button-primary">View results</button>
+      </form>
+      <form id="organizer-token-form">
+        <label for="organizer-token-input">Organizer secret</label>
+        <input
+          id="organizer-token-input"
+          name="token"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="submit" class="button button-primary">View as organizer</button>
+      </form>
       <p id="view-status" hidden></p>
       <article id="view-article" hidden>
         <h1 id="event-title"></h1>

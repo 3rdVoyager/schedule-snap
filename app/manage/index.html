@@ -32,6 +32,16 @@
   <body>
     <header></header>
     <main>
+      <form id="organizer-token-form">
+        <label for="organizer-token-input">Organizer secret</label>
+        <input
+          id="organizer-token-input"
+          name="token"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="submit" class="button button-primary">Continue</button>
+      </form>
       <p id="manage-status" hidden></p>
       <article id="manage-view" hidden>
         <h1 id="event-title"></h1>

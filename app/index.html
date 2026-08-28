@@ -36,11 +36,11 @@
         <fieldset>
           <legend>Event details</legend>
           <p>Provide a title and description for the event.</p>
-          <div>
+          <div class="form-field">
             <label for="title">Title</label>
             <input type="text" id="title" name="title" />
           </div>
-          <div>
+          <div class="form-field">
             <label for="description">Description</label>
             <textarea id="description" name="description"></textarea>
           </div>
@@ -48,8 +48,9 @@
         <fieldset>
           <legend>How long is the event?</legend>
           <p>This is the duration of the event.</p>
-          <label for="duration">Duration</label>
-          <select id="duration" name="duration">
+          <div class="form-field">
+            <label for="duration">Duration</label>
+            <select id="duration" name="duration">
             <option value="30">30 minutes</option>
             <option value="45">45 minutes</option>
             <option value="60" selected>1 hour</option>
@@ -58,6 +59,7 @@
             <option value="180">3 hours</option>
             <option value="360">6 hours</option>
           </select>
+          </div>
         </fieldset>
         <fieldset>
           <legend>What timezone is the event in?</legend>
@@ -65,8 +67,9 @@
             This is the timezone of the event. This is used to convert all
             responses to the event's timezone.
           </p>
-          <label for="timezone">Timezone</label>
-          <select id="timezone" name="timezone">
+          <div class="form-field">
+            <label for="timezone">Timezone</label>
+            <select id="timezone" name="timezone">
             <option value="Pacific/Pago_Pago">UTC-11 — Samoa</option>
             <option value="Pacific/Honolulu">UTC-10 — Hawaii</option>
             <option value="America/Anchorage">UTC-9 — Alaska</option>
@@ -97,6 +100,7 @@
             <option value="Pacific/Auckland">UTC+12 — Auckland</option>
             <option value="Pacific/Tongatapu">UTC+13 — Tonga</option>
           </select>
+          </div>
         </fieldset>
         <fieldset>
           <legend>When can participants schedule their availability?</legend>
@@ -119,12 +123,12 @@
               />
             </div>
           </div>
-          <button type="button" id="add-scheduling-window">
+          <button type="button" class="button button-secondary" id="add-scheduling-window">
             + Add scheduling window
           </button>
         </fieldset>
         <!-- Future: responseWindow, allowResponseEdits, resultsVisibleToParticipants -->
-        <button type="submit">Create Event</button>
+        <button type="submit" class="button button-primary">Create Event</button>
       </form>
       <!-- Hidden Success Message -->
       <div id="create-success" hidden>
@@ -139,11 +143,12 @@
         </section>
 
         <section>
-          <h3>Save your organizer link</h3>
+          <h3>Save your organizer access</h3>
           <p>
-            Anyone with this link can view responses and edit the event. Save it
-            somewhere safe — we only show it once.
+            Anyone with this secret can view responses and edit the event. Save
+            it somewhere safe — we only show it once.
           </p>
+          <p>Organizer secret: <strong id="organizer-secret"></strong></p>
           <label for="organizer-link">Organizer link</label>
           <input type="text" id="organizer-link" readonly />
           <button type="button" id="copy-organizer-link">

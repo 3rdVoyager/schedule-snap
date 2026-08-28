@@ -41,7 +41,7 @@
           maxlength="11"
           autocomplete="off"
         />
-        <button type="submit">Continue</button>
+        <button type="submit" class="button button-primary">Continue</button>
       </form>
       <p id="respond-status" hidden></p>
       <article id="event-view" hidden>
@@ -53,13 +53,15 @@
       <form id="response-form" hidden>
         <fieldset>
           <legend>Your details</legend>
-          <label for="display-name-input">Display name</label>
-          <input
-            id="display-name-input"
-            name="displayName"
-            placeholder="Display name"
-            required
-          />
+          <div class="form-field">
+            <label for="display-name-input">Display name</label>
+            <input
+              id="display-name-input"
+              name="displayName"
+              placeholder="Display name"
+              required
+            />
+          </div>
         </fieldset>
         <fieldset>
           <legend>When are you available?</legend>
@@ -85,11 +87,11 @@
               />
             </div>
           </div>
-          <button type="button" id="add-availability-window">
+          <button type="button" class="button button-secondary" id="add-availability-window">
             + Add availability window
           </button>
         </fieldset>
-        <button type="submit">Submit response</button>
+        <button type="submit" class="button button-primary">Submit response</button>
       </form>
 
       <div id="respond-success" hidden>
