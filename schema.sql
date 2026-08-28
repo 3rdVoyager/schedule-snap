@@ -15,6 +15,7 @@ CREATE TABLE events (
 CREATE TABLE responses (
   id            TEXT PRIMARY KEY,
   event_id      TEXT NOT NULL REFERENCES events(id),
+  edit_token    TEXT UNIQUE NOT NULL, -- 32 hex chars, grants edit for this response only
   display_name  TEXT NOT NULL,
   role          TEXT,                 -- optional, for weighted scheduling
   availability  TEXT NOT NULL,        -- JSON: ranges or slot map

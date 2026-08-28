@@ -1,47 +1,59 @@
 # ScheduleSnap Auth (v1)
 
-No accounts. Access is **capability-based**: short codes and secret links, not logins.
+No accounts. Access is **capability-based**: short codes and secret tokens, not logins.
 
 ## Roles
 
 | Role | Credential | What they can do |
 |------|------------|------------------|
-| **Participant** | Event code | Respond; view results only if organizer enabled sharing |
-| **Organizer** | Manage token (`Bearer`) | Full responses, edit event (planned); always can use `/view` |
+| **Participant** | Event code | Respond; view results if sharing enabled |
+| **Respondent (returning)** | Edit token (`Bearer`) | Edit own response when allowed |
+| **Organizer** | Manage token (`Bearer`) | Full responses, manage event; always can use `/view` |
 
-Event codes never grant manage/edit access.
+Event codes never grant manage access. Edit tokens never grant access to other responses.
+
+## App dashboard (`/app/`)
+
+Central entry for this device:
+
+- **Join an event** — enter event code → respond (or `?next=` target)
+- **Your events** — organizer events stored in `localStorage` (`schedulesnap:v1`)
+- **Your responses** — responses submitted on this device, with edit links
+- **Create** — `/app/create/`
+
+Pages without credentials redirect to `/app/?next=…`. Deep links (`?code=`, `#token=`, `#edit=`) skip the dashboard.
 
 ## Links
 
 | Link | URL |
 |------|-----|
+| Dashboard | `/app/` |
+| Create | `/app/create/` |
 | Respond | `/app/respond/?code={eventCode}` |
-| View results | `/app/view/?code={eventCode}` (participant) or `/app/view/#token={manageToken}` (organizer) |
-| Manage | `/app/manage/#token={manageToken}` |
+| Edit response | `/app/respond/#edit={editToken}` |
+| View (participant) | `/app/view/?code={eventCode}` |
+| View / manage (organizer) | `/app/view/#token={manageToken}` · `/app/manage/#token={manageToken}` |
 
-Manage token: 32 hex chars, returned once at create. Pasteable like the event code; link uses `#token=` hash. Also stored in `localStorage` (`manageToken:{eventId}`).
+**Manage token:** 32 hex, once at create. **Edit token:** 32 hex, once at response submit.
+
+## Local registry (device-only)
+
+```json
+{
+  "organizerEvents": [{ "id", "eventCode", "manageToken", "title", "addedAt" }],
+  "myResponses": [{ "responseId", "eventCode", "editToken", "eventTitle", "displayName", "submittedAt" }]
+}
+```
+
+Not synced across devices; no server-side account list in v1.
 
 ## Access rules
 
 ```
 Respond / read event metadata     → event code
-View recommendations + results    → event code IF resultsVisibleToParticipants, else organizer secret (Bearer)
-Full responses / manage event     → organizer secret (Bearer) only
+Edit own response                 → edit token (Bearer)
+View results                      → event code IF resultsVisibleToParticipants, else organizer secret
+Full responses / manage event     → organizer secret only
 ```
-
-`/view` is the single source of truth for recommendations (organizers use Bearer; participants use code when allowed). **403** when results exist but are not shared; **404** for bad code/token on protected routes.
-
-## Security (v1)
-
-- Manage links = passwords for that event.
-- Light rate limiting on code lookup when deployed.
-
-## Not in v1
-
-Accounts, OAuth, participant login, automated recovery.
-
-## v2 (shelved)
-
-Organizer workspace login; participants stay accountless.
 
 Endpoints: `docs/api.md`

@@ -1,41 +1,26 @@
 # Database (D1 / SQLite)
 
 v1 uses capability links instead of accounts: participants respond with an 8-digit
-event code; organizers act via a per-event secret manage token. No `users` or
-`sessions` tables until v2.
+event code; organizers act via a per-event secret manage token; respondents edit
+via a per-response edit token. No `users` or `sessions` tables until v2.
 
 ```sql
-CREATE TABLE events (
-  id           TEXT PRIMARY KEY,
-  event_code   TEXT UNIQUE NOT NULL,  -- 8 digits, stored without dashes
-  manage_token TEXT UNIQUE NOT NULL,
-  title        TEXT NOT NULL,
-  settings     TEXT,                  -- JSON blob
-  created_at   TEXT NOT NULL,
-  updated_at   TEXT NOT NULL
-);
-
 CREATE TABLE responses (
   id            TEXT PRIMARY KEY,
   event_id      TEXT NOT NULL REFERENCES events(id),
+  edit_token    TEXT UNIQUE NOT NULL,  -- 32 hex chars
   display_name  TEXT NOT NULL,
-  role          TEXT,
-  availability  TEXT NOT NULL,        -- JSON
-  preferences   TEXT,                 -- JSON
-  created_at    TEXT NOT NULL,
-  updated_at    TEXT NOT NULL
+  ...
 );
-
-CREATE INDEX idx_events_event_code ON events(event_code);
-CREATE INDEX idx_responses_event_id ON responses(event_id);
 ```
 
 ## Access patterns
 
 | Action | Lookup |
 |--------|--------|
-| View event, submit/edit response | Event code (low-privilege, rate-limited lookup) |
-| Organizer action | Manage token only (`WHERE manage_token = ?`) |
+| View event, submit response | `WHERE event_code = ?` |
+| Edit own response | `WHERE edit_token = ?` |
+| Organizer action | `WHERE manage_token = ?` |
 
 Full schema: `schema.sql` at repo root.
 
@@ -43,6 +28,6 @@ Full schema: `schema.sql` at repo root.
 
 | Operation | SQL |
 |-----------|-----|
-| Create event | Generate id + event_code + manage_token → INSERT with unique check on event_code |
-| Load event (participant) | `SELECT * FROM events WHERE event_code = ?` |
+| Submit response | INSERT with generated `edit_token` |
+| Edit response | `SELECT responses.*, events.* FROM responses JOIN events WHERE edit_token = ?` |
 | Organizer action | `SELECT * FROM events WHERE manage_token = ?` |
