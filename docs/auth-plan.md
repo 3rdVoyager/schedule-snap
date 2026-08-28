@@ -16,7 +16,7 @@ Event codes never grant manage/edit access.
 | Link | URL |
 |------|-----|
 | Respond | `/app/respond/?code={eventCode}` |
-| View results | `/app/view/?code={eventCode}` (when `resultsVisibleToParticipants`) |
+| View results | `/app/view/?code={eventCode}` or same URL with `#token={manageToken}` (organizer bypasses visibility setting) |
 | Manage | `/app/manage/?code={eventCode}#token={manageToken}` |
 
 Manage token: 32 hex chars, returned once at create. Hash keeps it off the static host; also stored in `localStorage` (`manageToken:{eventId}`).

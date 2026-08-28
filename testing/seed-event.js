@@ -18,3 +18,6 @@ if (!res.ok) {
 
 console.log(JSON.stringify(data, null, 2));
 console.log(`\nRespond: ${APP_ORIGIN}/app/respond/?code=${data.eventCode}`);
+console.log(`\nManage: ${APP_ORIGIN}/app/manage/?code=${data.eventCode}#token=${data.manageToken}`);
+console.log(`\nView: ${APP_ORIGIN}/app/view/?code=${data.eventCode}#token=${data.manageToken}`);
+console.log(`\nView: ${APP_ORIGIN}/app/view/?code=${data.eventCode}`);

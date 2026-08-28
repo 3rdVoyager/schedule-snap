@@ -14,7 +14,7 @@ JSON in/out. Errors: `{ "error": "message" }` with 4xx/5xx.
 
 Manage token returned **once** on create (`201`). Never in other responses.
 
-**Frontend links:** respond `/app/respond/?code={eventCode}` · results `/app/view/?code={eventCode}` · organizer `/app/manage/?code={eventCode}#token={manageToken}`
+**Frontend links:** respond `/app/respond/?code={eventCode}` · view `/app/view/?code={eventCode}` (optional `#token=` for organizer) · manage `/app/manage/?code={eventCode}#token={manageToken}`
 
 Details: `docs/auth-plan.md`
 

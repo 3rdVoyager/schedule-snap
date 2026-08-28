@@ -325,6 +325,66 @@ export default {
       segments[1] === "api" &&
       segments[2] === "events" &&
       segments[3] &&
+      segments[4] === "view" &&
+      !segments[5] &&
+      request.method === "GET"
+    ) {
+      const eventCode = segments[3];
+      const manageToken = bearerToken(request);
+
+      const event = manageToken
+        ? await env.DB.prepare(
+            "SELECT * FROM events WHERE event_code = ? AND manage_token = ?",
+          )
+            .bind(eventCode, manageToken)
+            .first()
+        : await env.DB.prepare("SELECT * FROM events WHERE event_code = ?")
+            .bind(eventCode)
+            .first();
+
+      if (event === null) {
+        return json({ error: "Event not found" }, 404);
+      }
+
+      const stored = parseStoredSettings(event.settings) ?? {};
+
+      if (!manageToken && !stored.resultsVisibleToParticipants) {
+        return json({ error: "Results are not visible to participants" }, 403);
+      }
+
+      const rows = await env.DB.prepare(
+        "SELECT * FROM responses WHERE event_id = ? ORDER BY created_at ASC",
+      )
+        .bind(event.id)
+        .all();
+
+      const responses = (rows.results ?? []).map((row) => {
+        let availability = [];
+        try {
+          availability = JSON.parse(row.availability);
+        } catch {
+          availability = [];
+        }
+        return {
+          id: row.id,
+          displayName: row.display_name,
+          availability,
+        };
+      });
+
+      return json({
+        eventCode: event.event_code,
+        title: event.title,
+        settings: publicSettings(stored),
+        recommendations: [],
+        responses,
+      });
+    }
+
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] &&
       !segments[4] &&
       request.method === "GET"
     ) {
