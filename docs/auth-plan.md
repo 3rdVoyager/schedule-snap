@@ -1,79 +1,47 @@
-# ScheduleSnap Auth Plan
+# ScheduleSnap Auth (v1)
 
-Lightweight auth split: **participants stay accountless**; **organizers use email + password** for multi-device workspace access.
+No accounts. Access is **capability-based**: short codes and secret links, not logins.
 
-## Overview
+## Roles
 
-| Role | Access | Account required |
-|------|--------|------------------|
-| **Organizer** | Create/manage polls, view all responses, run scheduling | Yes (email + password) |
-| **Participant** | View poll, submit/edit own availability & preferences | No |
+| Role | Credential | What they can do |
+|------|------------|------------------|
+| **Participant** | Event code | Respond; view results only if organizer enabled sharing |
+| **Organizer** | Manage token (`Bearer`) | Full responses, edit event (planned); always can use `/view` |
 
-Event codes grant **participant-only** access. They never grant organizer/admin actions.
+Event codes never grant manage/edit access.
 
-## Organizer: Workspace Login
+## Links
 
-Organizers register with **email + user-chosen password** to access their workspace from any device.
+| Link | URL |
+|------|-----|
+| Respond | `/app/respond/?code={eventCode}` |
+| View results | `/app/view/?code={eventCode}` (when `resultsVisibleToParticipants`) |
+| Manage | `/app/manage/?code={eventCode}#token={manageToken}` |
 
-- **Register:** email + password (min 12 characters)
-- **Login:** email + password → HttpOnly session cookie
-- **Session:** long-lived cookie per device; re-login only when session expires
-- **Password storage:** bcrypt or argon2 hash in D1 (never plaintext)
-- **Login rate limiting:** throttle failed attempts by IP and/or email
+Manage token: 32 hex chars, returned once at create. Hash keeps it off the static host; also stored in `localStorage` (`manageToken:{eventId}`).
 
-### Recovery
-
-No automated forgot-password flow in v1. UI should state clearly that passwords cannot be reset automatically without being already logged in. Optional manual reset by project maintainer — not a guaranteed feature.
-
-## Participant: Event codes (Meet-style)
-
-Each poll gets a short **event code** for sharing. Participants can:
-
-1. Open a direct link with the code embedded, or
-2. Visit a universal **`/respond`** page, enter the code, and land on that poll
-
-### Code format
-
-**Numeric only** 8 digits, formatted for readability (e.g. `482-910-73`).
-
-- No ambiguous characters; easy to read aloud and type on a phone
-- ~100M combinations — sufficient for participant-only access with rate limiting
-- Matches the Google Meet mental model
-
-- Generated server-side; checked for uniqueness before assignment
-
-### Security posture
-
-Poll codes are **low-privilege**. A guessed code only allows viewing the poll and submitting responses — not managing the workspace or other polls.
-
-Still apply **light rate limiting** on code lookup (anti-spam / bot protection, not high-security threat model).
-
-## Access Rules
+## Access rules
 
 ```
-Organizer actions  → valid workspace session (email + password)
-Participant view   → valid poll code or poll link
-Participant submit → valid poll code or poll link
-Poll admin/edit    → workspace session only (never poll code alone)
+Respond / read event metadata     → event code
+View recommendations + results    → event code IF resultsVisibleToParticipants, else Bearer
+Full responses / manage event     → Bearer only
 ```
 
-## What We Are Not Building (v1)
+`/view` is the single source of truth for recommendations (organizers use Bearer; participants use code when allowed). **403** when results exist but are not shared; **404** for bad code/token on protected routes.
 
-- Magic links via email
-- System-generated admin/recovery keys
-- Automated password reset
-- Participant accounts
-- OAuth / social login
+## Security (v1)
 
-## Infrastructure Notes
+- Manage links = passwords for that event.
+- Light rate limiting on code lookup when deployed.
 
-- **Frontend:** Cloudflare Pages
-- **API + auth:** Cloudflare Workers
-- **Persistent data:** Cloudflare D1 (schema defined separately)
-- Session cookies set by Worker; event code validation on respond endpoints
+## Not in v1
 
-## UX Summary
+Accounts, OAuth, participant login, automated recovery.
 
-**Organizer:** sign up once → log in on any device → dashboard with all polls.
+## v2 (shelved)
 
-**Participant:** receive link or code → respond. No signup.
+Organizer workspace login; participants stay accountless.
+
+Endpoints: `docs/api.md`

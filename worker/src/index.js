@@ -1,10 +1,10 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-const VALID_DURATIONS = new Set([30, 45, 60, 90, 120, 180, 360]);
+const validDurationMinutes = new Set([30, 45, 60, 90, 120, 180, 360]);
 
 function json(data, status = 200) {
   return Response.json(data, { status, headers: corsHeaders });
@@ -61,7 +61,7 @@ function validateSettings(rawSettings) {
   }
 
   const durationMinutes = rawSettings.durationMinutes;
-  if (!VALID_DURATIONS.has(durationMinutes)) {
+  if (!validDurationMinutes.has(durationMinutes)) {
     return {
       error:
         "settings.durationMinutes must be one of 30, 45, 60, 90, 120, 180, 360",
@@ -178,6 +178,13 @@ function validateAvailability(raw) {
   return { availability };
 }
 
+function bearerToken(request) {
+  const auth = request.headers.get("Authorization");
+  if (!auth?.startsWith("Bearer ")) return null;
+  const token = auth.slice(7).trim();
+  return token.length > 0 ? token : null;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -246,6 +253,79 @@ export default {
       segments[1] === "api" &&
       segments[2] === "events" &&
       segments[3] &&
+      segments[4] === "manage" &&
+      !segments[5] &&
+      request.method === "GET"
+    ) {
+      const eventCode = segments[3];
+      const manageToken = bearerToken(request);
+
+      if (!manageToken) {
+        return json({ error: "Authorization required" }, 401);
+      }
+
+      const event = await env.DB.prepare(
+        "SELECT * FROM events WHERE event_code = ? AND manage_token = ?",
+      )
+        .bind(eventCode, manageToken)
+        .first();
+
+      if (event === null) {
+        return json({ error: "Event not found" }, 404);
+      }
+
+      const stored = parseStoredSettings(event.settings) ?? {};
+
+      const rows = await env.DB.prepare(
+        "SELECT * FROM responses WHERE event_id = ? ORDER BY created_at ASC",
+      )
+        .bind(event.id)
+        .all();
+
+      const responses = (rows.results ?? []).map((row) => {
+        let availability = [];
+        try {
+          availability = JSON.parse(row.availability);
+        } catch {
+          availability = [];
+        }
+        let preferences = null;
+        if (row.preferences != null) {
+          try {
+            preferences = JSON.parse(row.preferences);
+          } catch {
+            preferences = null;
+          }
+        }
+        return {
+          id: row.id,
+          displayName: row.display_name,
+          role: row.role,
+          availability,
+          preferences,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        };
+      });
+
+      return json({
+        id: event.id,
+        eventCode: event.event_code,
+        title: event.title,
+        description:
+          typeof stored.description === "string" ? stored.description : "",
+        settings: publicSettings(stored),
+        responses,
+        createdAt: event.created_at,
+        updatedAt: event.updated_at,
+      });
+    }
+
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] &&
+      !segments[4] &&
       request.method === "GET"
     ) {
       const eventCode = segments[3];

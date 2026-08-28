@@ -4,7 +4,7 @@ export const API_URL = "http://127.0.0.1:8787";
 export const APP_ORIGIN = "http://localhost:3000";
 
 /** 8-digit event code to reuse in prefill-respond; leave empty to create a new event. */
-export const REUSE_EVENT_CODE = "";
+export const REUSE_EVENT_CODE = "49716826";
 
 // --- Sample event (America/New_York, UTC-4 in September) ---
 
