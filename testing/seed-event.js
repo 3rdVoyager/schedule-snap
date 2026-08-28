@@ -17,7 +17,9 @@ if (!res.ok) {
 }
 
 console.log(JSON.stringify(data, null, 2));
+console.log(`\nDashboard: ${APP_ORIGIN}/app/`);
 console.log(`\nRespond: ${APP_ORIGIN}/app/respond/?code=${data.eventCode}`);
 console.log(`\nManage: ${APP_ORIGIN}/app/manage/#token=${data.manageToken}`);
 console.log(`\nView (organizer): ${APP_ORIGIN}/app/view/#token=${data.manageToken}`);
 console.log(`\nView (participant): ${APP_ORIGIN}/app/view/?code=${data.eventCode}`);
+console.log(`\nCreate: ${APP_ORIGIN}/app/create/`);

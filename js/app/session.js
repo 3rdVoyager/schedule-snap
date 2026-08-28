@@ -26,7 +26,9 @@ export function normalizeEditToken(raw) {
 
 export function parseDeepLink() {
   const params = new URLSearchParams(window.location.search);
-  const hash = new URLSearchParams(window.location.hash.slice(1));
+  const rawHash = window.location.hash.slice(1);
+  const hash =
+    rawHash.includes("=") ? new URLSearchParams(rawHash) : new URLSearchParams();
   return {
     code: normalizeEventCode(params.get("code")),
     token: normalizeManageToken(hash.get("token")),

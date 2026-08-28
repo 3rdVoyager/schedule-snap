@@ -7,8 +7,8 @@ header.innerHTML = `
             <div class="brand-text"><span class="brand-text-primary">Schedule</span><span class="brand-text-secondary">Snap</span></div>
         </a>
         <ul>
-            <li><a href="/app/">Dashboard</a></li>
-            <li><a href="/app/create/">Create Event</a></li>
+            <li><a href="/app/" class="button button-primary-outline">Dashboard</a></li>
+            <li><a href="/app/create/" class="button button-secondary-outline">Create Event</a></li>
         </ul>
     </nav>
 `;

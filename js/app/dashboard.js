@@ -130,6 +130,7 @@ function renderLists() {
 function renderOrganizerEvents() {
   const events = getOrganizerEvents();
   organizerList.replaceChildren();
+  organizerList.hidden = events.length === 0;
   organizerEmpty.hidden = events.length > 0;
 
   for (const event of events) {
@@ -146,7 +147,7 @@ function renderOrganizerEvents() {
 
     const manageBtn = document.createElement("a");
     manageBtn.href = appendToken("/app/manage/", event.manageToken);
-    manageBtn.className = "button button-secondary";
+    manageBtn.className = "button button-primary-outline";
     manageBtn.textContent = "Manage";
     manageBtn.addEventListener("click", () => {
       setActiveOrganizerEventId(event.id);
@@ -155,7 +156,7 @@ function renderOrganizerEvents() {
 
     const viewBtn = document.createElement("a");
     viewBtn.href = appendToken("/app/view/", event.manageToken);
-    viewBtn.className = "button button-secondary";
+    viewBtn.className = "button button-primary-outline";
     viewBtn.textContent = "View";
     viewBtn.addEventListener("click", () => {
       setActiveOrganizerEventId(event.id);
@@ -189,6 +190,7 @@ async function refreshOrganizerTitle(event) {
 function renderMyResponses() {
   const responses = getMyResponses();
   responsesList.replaceChildren();
+  responsesList.hidden = responses.length === 0;
   responsesEmpty.hidden = responses.length > 0;
 
   for (const entry of responses) {
@@ -205,14 +207,14 @@ function renderMyResponses() {
 
     const editBtn = document.createElement("a");
     editBtn.href = `/app/respond/#edit=${entry.editToken}`;
-    editBtn.className = "button button-secondary";
+    editBtn.className = "button button-primary-outline";
     editBtn.textContent = "Edit";
     actions.appendChild(editBtn);
 
     if (entry.resultsVisibleToParticipants) {
       const viewBtn = document.createElement("a");
       viewBtn.href = `/app/view/?code=${entry.eventCode}`;
-      viewBtn.className = "button button-secondary";
+      viewBtn.className = "button button-primary-outline";
       viewBtn.textContent = "View results";
       actions.appendChild(viewBtn);
     }

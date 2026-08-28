@@ -38,7 +38,7 @@ function buildCreateFormSnippet() {
   return lines.join("\n");
 }
 
-const createUrl = `${APP_ORIGIN}/app/`;
+const createUrl = `${APP_ORIGIN}/app/create/`;
 
 console.log("1. Open the create page:");
 console.log(`   ${createUrl}\n`);
