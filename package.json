@@ -6,10 +6,7 @@
     "db:schema": "cd worker && npx wrangler d1 execute schedule-snap-db --local --file=../schema.sql",
     "db:schema:remote": "cd worker && npx wrangler d1 execute schedule-snap-db --remote --file=../schema.sql",
     "db:tables": "cd worker && npx wrangler d1 execute schedule-snap-db --local --command \"SELECT name FROM sqlite_master WHERE type='table'\"",
-    "db:reset": "node -e \"require('fs').rmSync('worker/.wrangler/state',{recursive:true,force:true})\" && npm run db:schema",
-    "seed:event": "node testing/seed-event.js",
-    "dev:prefill-create": "node testing/prefill-create.js",
-    "dev:prefill-respond": "node testing/prefill-respond.js"
+    "db:reset": "node -e \"require('fs').rmSync('worker/.wrangler/state',{recursive:true,force:true})\" && npm run db:schema"
   },
   "devDependencies": {
     "wrangler": "^4.125.0"
