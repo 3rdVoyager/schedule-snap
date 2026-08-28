@@ -9,12 +9,12 @@ JSON in/out. Errors: `{ "error": "message" }` with 4xx/5xx.
 | Capability | Credential |
 |------------|------------|
 | View event (respond UI), submit response | Event code (path) |
-| View results + recommendations | Event code if `resultsVisibleToParticipants`, else Bearer token |
-| Full responses list, edit event | Bearer token only |
+| View results + recommendations | Event code if `resultsVisibleToParticipants`, else organizer secret (Bearer) |
+| Full responses list, edit event | Organizer secret (Bearer) only |
 
-Manage token returned **once** on create (`201`). Never in other responses.
+Manage token returned **once** on create (`201`). Never in other responses. Globally unique — organizer routes do not require the event code.
 
-**Frontend links:** respond `/app/respond/?code={eventCode}` · view `/app/view/?code={eventCode}` (optional `#token=` for organizer) · manage `/app/manage/?code={eventCode}#token={manageToken}`
+**Frontend links:** respond `/app/respond/?code={eventCode}` · view `/app/view/?code={eventCode}` (participant) or `/app/view/#token={manageToken}` (organizer) · manage `/app/manage/#token={manageToken}`
 
 Details: `docs/auth-plan.md`
 
@@ -23,8 +23,8 @@ Details: `docs/auth-plan.md`
 | Surface | API | Audience | Contents |
 |---------|-----|----------|----------|
 | **Event** | `GET …/:eventCode` | Anyone with code | Metadata + settings to respond — no responses, no recommendations |
-| **View** | `GET …/:eventCode/view` | Code (if allowed) or Bearer | Recommendations + visible results — **single source of truth for scheduling output** |
-| **Manage** | `GET …/:eventCode/manage` | Bearer only | Event + full raw responses (organizer operations) |
+| **View** | `GET …/:eventCode/view` or `GET …/view` | Code (if allowed) or Bearer | Recommendations + visible results — **single source of truth for scheduling output** |
+| **Manage** | `GET …/manage` | Bearer only | Event + full raw responses (organizer operations) |
 
 Organizers fetch recommendations via **`/view`** (with Bearer), not a separate manage subpath.
 
@@ -63,31 +63,15 @@ Organizers fetch recommendations via **`/view`** (with Bearer), not a separate m
 
 **Body:** `{ displayName, availability: [{ start, end }], preferences: null }` · **201:** `{ id }` · **400** · **404**
 
-### `GET /api/events/:eventCode/view` — results (planned)
+### `GET /api/events/:eventCode/view` — results (participant)
 
-Recommendations + responses when permitted.
+Event code only · **200** if `settings.resultsVisibleToParticipants`, else **403** · **404**
 
-**Auth:**
+### `GET /api/events/view` — results (organizer)
 
-- **Bearer** → always **200** (organizer)
-- **Event code only** → **200** if `settings.resultsVisibleToParticipants`, else **403**
-- Unknown code → **404**
+**Bearer required** (organizer secret) · **200:** recommendations + responses · **401** · **404**
 
-**200 (shape, tentative):**
-
-```json
-{
-  "eventCode": "49716826",
-  "title": "...",
-  "settings": { "...": "..." },
-  "recommendations": [{ "start": "...", "end": "...", "score": 0.9 }],
-  "responses": [{ "id": "...", "displayName": "...", "availability": [...] }]
-}
-```
-
-`responses` omitted or empty when caller only receives recommendations-only policy (TBD); v1 likely includes responses when the setting is on.
-
-### `GET /api/events/:eventCode/manage` — organizer
+### `GET /api/events/manage` — organizer
 
 **Bearer required** · **200:** event + `responses[]` (full list) · **401** · **404**
 
@@ -100,11 +84,12 @@ Recommendations + responses when permitted.
 | `POST` | `/api/events` | — | Built | Create event |
 | `GET` | `/api/events/:eventCode` | Event code | Built | Event metadata for respond flow |
 | `POST` | `/api/events/:eventCode/responses` | Event code | Built | Submit response |
-| `GET` | `/api/events/:eventCode/view` | Code* or Bearer | Planned | Recommendations + participant-visible results |
-| `GET` | `/api/events/:eventCode/manage` | Bearer | Built | Organizer: event + all responses |
+| `GET` | `/api/events/:eventCode/view` | Event code* | Built | Participant-visible results |
+| `GET` | `/api/events/view` | Bearer | Built | Organizer: recommendations + results |
+| `GET` | `/api/events/manage` | Bearer | Built | Organizer: event + all responses |
 | `PUT` | `/api/events/:eventCode/responses/:responseId` | Event code | Planned | Edit own response |
-| `PUT` | `/api/events/:eventCode/manage` | Bearer | Planned | Edit settings / close event |
+| `PUT` | `/api/events/manage` | Bearer | Planned | Edit settings / close event |
 
-\*Event code on `/view` only when `resultsVisibleToParticipants` is true.
+\*Event code on `/api/events/:eventCode/view` only when `resultsVisibleToParticipants` is true.
 
-`:eventCode` — 8 digits. Bearer routes: `WHERE event_code = ? AND manage_token = ?`.
+`:eventCode` — 8 digits. Bearer routes: `WHERE manage_token = ?`.

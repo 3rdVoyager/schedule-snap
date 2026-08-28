@@ -16,17 +16,17 @@ Event codes never grant manage/edit access.
 | Link | URL |
 |------|-----|
 | Respond | `/app/respond/?code={eventCode}` |
-| View results | `/app/view/?code={eventCode}` or same URL with `#token={manageToken}` (organizer bypasses visibility setting) |
-| Manage | `/app/manage/?code={eventCode}#token={manageToken}` |
+| View results | `/app/view/?code={eventCode}` (participant) or `/app/view/#token={manageToken}` (organizer) |
+| Manage | `/app/manage/#token={manageToken}` |
 
-Manage token: 32 hex chars, returned once at create. Hash keeps it off the static host; also stored in `localStorage` (`manageToken:{eventId}`).
+Manage token: 32 hex chars, returned once at create. Pasteable like the event code; link uses `#token=` hash. Also stored in `localStorage` (`manageToken:{eventId}`).
 
 ## Access rules
 
 ```
 Respond / read event metadata     → event code
-View recommendations + results    → event code IF resultsVisibleToParticipants, else Bearer
-Full responses / manage event     → Bearer only
+View recommendations + results    → event code IF resultsVisibleToParticipants, else organizer secret (Bearer)
+Full responses / manage event     → organizer secret (Bearer) only
 ```
 
 `/view` is the single source of truth for recommendations (organizers use Bearer; participants use code when allowed). **403** when results exist but are not shared; **404** for bad code/token on protected routes.

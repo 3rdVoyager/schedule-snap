@@ -35,7 +35,7 @@ CREATE INDEX idx_responses_event_id ON responses(event_id);
 | Action | Lookup |
 |--------|--------|
 | View event, submit/edit response | Event code (low-privilege, rate-limited lookup) |
-| Organizer action | Event code + manage token |
+| Organizer action | Manage token only (`WHERE manage_token = ?`) |
 
 Full schema: `schema.sql` at repo root.
 
@@ -45,4 +45,4 @@ Full schema: `schema.sql` at repo root.
 |-----------|-----|
 | Create event | Generate id + event_code + manage_token → INSERT with unique check on event_code |
 | Load event (participant) | `SELECT * FROM events WHERE event_code = ?` |
-| Organizer action | `SELECT * FROM events WHERE event_code = ? AND manage_token = ?` |
+| Organizer action | `SELECT * FROM events WHERE manage_token = ?` |
