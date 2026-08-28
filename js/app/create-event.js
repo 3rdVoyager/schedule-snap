@@ -72,12 +72,13 @@ createEventForm.addEventListener("submit", async (event) => {
     localStorage.setItem(`manageToken:${data.id}`, data.manageToken);
 
     const respondUrl = `${window.location.origin}/app/respond/?code=${data.eventCode}`;
-    const manageUrl = `${window.location.origin}/app/manage/?code=${data.eventCode}#token=${data.manageToken}`;
+    const manageUrl = `${window.location.origin}/app/manage/#token=${data.manageToken}`;
 
     document.querySelector("#create-event-form").hidden = true;
 
     const success = document.querySelector("#create-success");
     document.querySelector("#event-code").textContent = data.eventCode;
+    document.querySelector("#organizer-secret").textContent = data.manageToken;
     document.querySelector("#respond-link").value = respondUrl;
     document.querySelector("#organizer-link").value = manageUrl;
     success.hidden = false;
