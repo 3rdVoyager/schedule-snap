@@ -93,3 +93,21 @@ export function zonedToUtcIso(naive, tz) {
   const offset = tzOffsetMs(wallAsUtc, tz);
   return new Date(wallAsUtc.getTime() - offset).toISOString();
 }
+
+/**
+ * Convert a UTC ISO instant to a datetime-local string in the event timezone.
+ */
+export function utcToDatetimeLocal(iso, tz) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(iso));
+  const get = (type) => parts.find((p) => p.type === type).value;
+  const hour = String(Number(get("hour")) % 24).padStart(2, "0");
+  return `${get("year")}-${get("month")}-${get("day")}T${hour}:${get("minute")}`;
+}

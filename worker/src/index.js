@@ -185,10 +185,53 @@ function bearerToken(request) {
   return token.length > 0 ? token : null;
 }
 
+function generateHexToken(byteLength = 16) {
+  const tokenBytes = crypto.getRandomValues(new Uint8Array(byteLength));
+  return [...tokenBytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 async function getEventByManageToken(env, manageToken) {
   return env.DB.prepare("SELECT * FROM events WHERE manage_token = ?")
     .bind(manageToken)
     .first();
+}
+
+async function getResponseWithEventByEditToken(env, editToken) {
+  const row = await env.DB.prepare(
+    `SELECT responses.*, events.event_code, events.title AS event_title, events.settings AS event_settings
+     FROM responses
+     JOIN events ON events.id = responses.event_id
+     WHERE responses.edit_token = ?`,
+  )
+    .bind(editToken)
+    .first();
+  return row ?? null;
+}
+
+function parseResponseRow(row) {
+  let availability = [];
+  try {
+    availability = JSON.parse(row.availability);
+  } catch {
+    availability = [];
+  }
+  let preferences = null;
+  if (row.preferences != null) {
+    try {
+      preferences = JSON.parse(row.preferences);
+    } catch {
+      preferences = null;
+    }
+  }
+  return {
+    id: row.id,
+    displayName: row.display_name,
+    role: row.role,
+    availability,
+    preferences,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 export default {
@@ -234,10 +277,7 @@ export default {
       const randomNumber = crypto.getRandomValues(new Uint32Array(1))[0];
       const eventCode = String(randomNumber % 100_000_000).padStart(8, "0");
 
-      const tokenBytes = crypto.getRandomValues(new Uint8Array(16));
-      const manageToken = [...tokenBytes]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const manageToken = generateHexToken();
 
       const settingsToStore = JSON.stringify({
         description,
@@ -456,6 +496,109 @@ export default {
       });
     }
 
+    if (
+      segments[1] === "api" &&
+      segments[2] === "responses" &&
+      segments[3] === "edit" &&
+      !segments[4] &&
+      request.method === "GET"
+    ) {
+      const editToken = bearerToken(request);
+      if (!editToken) {
+        return json({ error: "Authorization required" }, 401);
+      }
+
+      const row = await getResponseWithEventByEditToken(env, editToken);
+      if (row === null) {
+        return json({ error: "Invalid edit token" }, 404);
+      }
+
+      const stored = parseStoredSettings(row.event_settings) ?? {};
+
+      return json({
+        eventCode: row.event_code,
+        title: row.event_title,
+        description:
+          typeof stored.description === "string" ? stored.description : "",
+        settings: publicSettings(stored),
+        response: parseResponseRow(row),
+      });
+    }
+
+    if (
+      segments[1] === "api" &&
+      segments[2] === "responses" &&
+      segments[3] === "edit" &&
+      !segments[4] &&
+      request.method === "PUT"
+    ) {
+      const editToken = bearerToken(request);
+      if (!editToken) {
+        return json({ error: "Authorization required" }, 401);
+      }
+
+      const row = await getResponseWithEventByEditToken(env, editToken);
+      if (row === null) {
+        return json({ error: "Invalid edit token" }, 404);
+      }
+
+      const stored = parseStoredSettings(row.event_settings) ?? {};
+      if (stored.allowResponseEdits === false) {
+        return json({ error: "Response edits are not allowed for this event" }, 403);
+      }
+
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Body must be valid JSON" }, 400);
+      }
+
+      const displayName =
+        typeof body.displayName === "string" ? body.displayName.trim() : "";
+      if (displayName.length === 0) {
+        return json({ error: "displayName is required" }, 400);
+      }
+
+      const availability = body.availability;
+      if (!Array.isArray(availability)) {
+        return json({ error: "availability must be an array" }, 400);
+      }
+
+      const validated = validateAvailability(availability);
+      if (validated.error) {
+        return json({ error: validated.error }, 400);
+      }
+
+      const schedulingWindows = stored.schedulingWindows ?? [];
+      for (let i = 0; i < validated.availability.length; i++) {
+        const range = validated.availability[i];
+        const inside = schedulingWindows.some((w) => isInsideWindow(range, w));
+        if (!inside) {
+          return json(
+            {
+              error: `availability[${i}] must fall within a scheduling window`,
+            },
+            400,
+          );
+        }
+      }
+
+      const now = new Date().toISOString();
+      await env.DB.prepare(
+        "UPDATE responses SET display_name = ?, availability = ?, updated_at = ? WHERE id = ?",
+      )
+        .bind(
+          displayName,
+          JSON.stringify(validated.availability),
+          now,
+          row.id,
+        )
+        .run();
+
+      return json({ id: row.id, editToken }, 200);
+    }
+
     // Response form processing
     if (
       segments[1] === "api" &&
@@ -512,19 +655,21 @@ export default {
 
       const now = new Date().toISOString();
       const id = crypto.randomUUID();
+      const editToken = generateHexToken();
       await env.DB.prepare(
-        "INSERT INTO responses (id, event_id, display_name, availability, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO responses (id, event_id, edit_token, display_name, availability, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
       )
         .bind(
           id,
           event.id,
+          editToken,
           displayName,
           JSON.stringify(validated.availability),
           now,
           now,
         )
         .run();
-      return json({ id }, 201);
+      return json({ id, editToken }, 201);
     }
     return json({ message: "Not found" }, 404);
   },

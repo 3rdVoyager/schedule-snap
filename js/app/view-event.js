@@ -1,72 +1,30 @@
 import { API_URL } from "./config.js";
+import {
+  parseDeepLink,
+  redirectToDashboard,
+  registerOrganizerEvent,
+  resolveManageToken,
+  resolveParticipantCode,
+  setActiveOrganizerEventId,
+  setParticipantEventCode,
+} from "./session.js";
 
-const eventCodeForm = document.querySelector("#event-code-form");
-const organizerForm = document.querySelector("#organizer-token-form");
 const statusEl = document.querySelector("#view-status");
 const article = document.querySelector("#view-article");
 
-const tokenFromHash = tokenFromUrl();
-const eventCodeFromUrl = codeFromUrl();
+const deepLink = parseDeepLink();
+const manageToken = resolveManageToken();
+const participantCode = resolveParticipantCode();
 
-if (tokenFromHash.length === 32) {
-  loadOrganizerView(tokenFromHash);
-} else if (eventCodeFromUrl.length === 8) {
-  loadParticipantView(eventCodeFromUrl);
-}
-
-eventCodeForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const eventCode = normalizeEventCode(e.target.code.value);
-  if (eventCode.length !== 8) {
-    statusEl.hidden = false;
-    statusEl.textContent = "Enter a valid 8-digit event code.";
-    return;
-  }
-  const url = new URL(window.location.href);
-  url.searchParams.set("code", eventCode);
-  url.hash = "";
-  history.replaceState(null, "", url);
-  loadParticipantView(eventCode);
-});
-
-organizerForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const manageToken = normalizeManageToken(e.target.token.value);
-  if (manageToken.length !== 32) {
-    statusEl.hidden = false;
-    statusEl.textContent = "Enter a valid organizer secret.";
-    return;
-  }
-  const url = new URL(window.location.href);
-  url.searchParams.delete("code");
-  url.hash = `token=${manageToken}`;
-  history.replaceState(null, "", url);
+if (manageToken.length === 32) {
   loadOrganizerView(manageToken);
-});
-
-function normalizeEventCode(raw) {
-  return String(raw ?? "")
-    .replace(/\D/g, "")
-    .slice(0, 8);
-}
-
-function normalizeManageToken(raw) {
-  return String(raw ?? "")
-    .replace(/[^a-fA-F0-9]/g, "")
-    .toLowerCase()
-    .slice(0, 32);
-}
-
-function codeFromUrl() {
-  return normalizeEventCode(
-    new URLSearchParams(location.search).get("code"),
-  );
-}
-
-function tokenFromUrl() {
-  return normalizeManageToken(
-    new URLSearchParams(location.hash.slice(1)).get("token"),
-  );
+} else if (participantCode.length === 8) {
+  if (deepLink.code.length === 8) {
+    setParticipantEventCode(deepLink.code);
+  }
+  loadParticipantView(participantCode);
+} else {
+  redirectToDashboard("/app/view/");
 }
 
 async function loadParticipantView(eventCode) {
@@ -82,31 +40,43 @@ async function loadParticipantView(eventCode) {
       return;
     }
     statusEl.hidden = true;
-    eventCodeForm.hidden = true;
-    organizerForm.hidden = true;
     renderView(data);
   } catch {
     statusEl.textContent = "Could not reach the server";
   }
 }
 
-async function loadOrganizerView(manageToken) {
+async function loadOrganizerView(token) {
   statusEl.hidden = false;
   statusEl.textContent = "Loading…";
   article.hidden = true;
 
   try {
     const response = await fetch(`${API_URL}/api/events/view`, {
-      headers: { Authorization: `Bearer ${manageToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
     if (!response.ok) {
       statusEl.textContent = data.error ?? "Could not load results";
       return;
     }
+
+    const manageRes = await fetch(`${API_URL}/api/events/manage`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const manageData = await manageRes.json();
+    if (manageRes.ok) {
+      const entry = registerOrganizerEvent(manageData, token);
+      setActiveOrganizerEventId(entry.id);
+    }
+
+    if (deepLink.token.length === 32) {
+      const url = new URL(window.location.href);
+      url.hash = "";
+      history.replaceState(null, "", url);
+    }
+
     statusEl.hidden = true;
-    eventCodeForm.hidden = true;
-    organizerForm.hidden = true;
     renderView(data);
   } catch {
     statusEl.textContent = "Could not reach the server";

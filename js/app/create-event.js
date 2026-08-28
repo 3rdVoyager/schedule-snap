@@ -1,5 +1,7 @@
 import { API_URL } from "./config.js";
 import { zonedToUtcIso } from "./time.js";
+import { addMyResponse } from "./registry.js";
+import { registerOrganizerEvent } from "./session.js";
 
 const createEventForm = document.querySelector("#create-event-form");
 
@@ -69,7 +71,7 @@ createEventForm.addEventListener("submit", async (event) => {
       return;
     }
 
-    localStorage.setItem(`manageToken:${data.id}`, data.manageToken);
+    registerOrganizerEvent(data, data.manageToken);
 
     const respondUrl = `${window.location.origin}/app/respond/?code=${data.eventCode}`;
     const manageUrl = `${window.location.origin}/app/manage/#token=${data.manageToken}`;
