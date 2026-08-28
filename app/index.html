@@ -8,76 +8,125 @@
     <script src="/js/app/nav.js" defer></script>
     <script type="module" src="/js/app/dashboard.js"></script>
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/assets/logos/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/assets/logos/favicon-16x16.png"
-    />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logos/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/logos/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <header></header>
+
     <main class="dashboard-main">
-      <h1>ScheduleSnap</h1>
+      <header class="dashboard-page-header">
+        <div>
+          <h1>Dashboard</h1>
 
-      <section class="dashboard-section" id="join-section">
-        <h2>Join an event</h2>
-        <p>Enter the 8-digit event code from your organizer.</p>
-        <form id="join-form" class="dashboard-card">
-          <label for="join-code-input">Event code</label>
-          <input
-            id="join-code-input"
-            name="code"
-            inputmode="numeric"
-            maxlength="11"
-            autocomplete="off"
-          />
-          <button type="submit" class="button button-primary">Continue</button>
-        </form>
-      </section>
+          <p class="dashboard-lead">
+            Join an event, manage one you organize, or pick up where you left
+            off.
+          </p>
+        </div>
+      </header>
 
-      <section class="dashboard-section" id="organizer-section">
-        <h2>Your events</h2>
-        <p>Events you organize on this device.</p>
-        <ul id="organizer-events-list" class="dashboard-list"></ul>
-        <p id="organizer-empty" class="dashboard-empty" hidden>No events yet.</p>
-        <form id="add-organizer-form" class="dashboard-card">
-          <label for="organizer-secret-input">Add with organizer secret</label>
-          <input
-            id="organizer-secret-input"
-            name="token"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button type="submit" class="button button-secondary">Add event</button>
-        </form>
-        <p>
-          <a href="/app/create/" class="button button-primary">Create new event</a>
+      <div class="dashboard-entry-panel">
+        <div class="dashboard-entry-grid">
+          <section class="dashboard-section" id="join-by-code">
+            <h2>Join an event</h2>
+
+            <p>Enter the 8-digit event code from your organizer.</p>
+
+            <form id="join-form" class="dashboard-card">
+              <label for="join-code-input">Event code</label>
+
+              <input
+                id="join-code-input"
+                class="dashboard-code-input"
+                name="code"
+                inputmode="numeric"
+                maxlength="11"
+                autocomplete="off"
+                placeholder="12345678"
+              />
+
+              <button type="submit" class="button button-primary-outline">
+                Continue
+              </button>
+            </form>
+          </section>
+
+          <section class="dashboard-section" id="manage-by-secret">
+            <h2>Manage an event</h2>
+
+            <p>Paste your organizer secret to open an event you organize.</p>
+
+            <form id="add-organizer-form" class="dashboard-card">
+              <label for="organizer-secret-input">Organizer secret</label>
+
+              <input
+                id="organizer-secret-input"
+                class="dashboard-code-input"
+                name="token"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Paste your organizer secret"
+              />
+
+              <button type="submit" class="button button-primary-outline">
+                Continue
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <p id="dashboard-status" class="dashboard-status" hidden></p>
+      </div>
+
+      <div class="dashboard-saved">
+        <section class="dashboard-section" id="organizer-section">
+          <h2>Your events</h2>
+
+          <p>Events you organize on this device.</p>
+
+          <div class="dashboard-list-panel">
+            <ul id="organizer-events-list" class="dashboard-list"></ul>
+
+            <div id="organizer-empty" class="dashboard-empty-state" hidden>
+              <p>No events yet.</p>
+
+              <p>
+                Add an event with your organizer secret above, or
+                <a href="/app/create/">create a new one</a>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard-section" id="responses-section">
+          <h2>Your responses</h2>
+
+          <p>Events you have responded to on this device.</p>
+
+          <div class="dashboard-list-panel">
+            <ul id="my-responses-list" class="dashboard-list"></ul>
+
+            <div id="responses-empty" class="dashboard-empty-state" hidden>
+              <p>No responses yet.</p>
+
+              <p>
+                Join an event with an event code above to submit your
+                availability.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <p class="dashboard-device-note">
+          Saved events and responses are stored on this device only.
         </p>
-      </section>
-
-      <section class="dashboard-section" id="responses-section">
-        <h2>Your responses</h2>
-        <p>Events you have responded to on this device.</p>
-        <ul id="my-responses-list" class="dashboard-list"></ul>
-        <p id="responses-empty" class="dashboard-empty" hidden>No responses yet.</p>
-      </section>
-
-      <p id="dashboard-status" class="dashboard-status" hidden></p>
+      </div>
     </main>
   </body>
 </html>

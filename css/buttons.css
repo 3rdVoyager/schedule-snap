@@ -1,29 +1,56 @@
 .button {
     display: inline-block;
     text-decoration: none;
-    border: none;
+    border: 2px solid transparent;
     cursor: pointer;
     font-weight: 600;
+    font-size: var(--text-size-medium);
     color: var(--button-text-color);
     padding: 10px 20px;
     border-radius: var(--button-border-radius);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .button-primary {
     background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .button-primary:hover {
     background-color: var(--primary-color-hover);
+    border-color: var(--primary-color-hover);
 }
 
-.button-secondary {
+.button-primary-outline {
     background-color: white;
-    border: 2px solid var(--primary-color);
+    border-color: var(--primary-color);
     color: var(--primary-color);
 }
 
-.button-secondary:hover {
+.button-primary-outline:hover {
     background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.button-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: var(--text-on-accent);
+}
+
+.button-secondary:hover {
+    background-color: var(--secondary-color-hover);
+    border-color: var(--secondary-color-hover);
+    color: var(--text-on-accent);
+}
+
+.button-secondary-outline {
+    background-color: white;
+    border-color: var(--secondary-color);
+    color: var(--secondary-color-hover);
+}
+
+.button-secondary-outline:hover {
+    background-color: var(--secondary-color-light);
+    color: var(--secondary-color-hover);
 }

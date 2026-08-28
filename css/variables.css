@@ -8,6 +8,8 @@
     --primary-color-light: #ecfffb;
     --secondary-color: var(--brand-color-yellow);
     --secondary-color-hover: #dfb40a;
+    --secondary-color-light: #fefce8;
+    --text-on-accent: #1a1a1a;
     --tertiary-color: var(--brand-color-white);
     --tertiary-color-hover: #afafaf;
 
@@ -31,10 +33,14 @@
     --nav-padding: 20px;
 
     /* App */
+    --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;
     --space-lg: 24px;
     --space-xl: 32px;
+
+    --text-muted: #737373;
+    --color-error: #b42318;
 
     --surface-page: #fafafa;
     --surface-card: #ffffff;
