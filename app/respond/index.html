@@ -1,103 +1,203 @@
 <!doctype html>
+
 <html lang="en">
+
   <head>
+
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Respond to Event | ScheduleSnap</title>
+
     <link rel="stylesheet" href="/css/app/main.css" />
+
     <script src="/js/app/nav.js" defer></script>
+
     <script type="module" src="/js/app/respond-event.js"></script>
+
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
+
     <link
+
       rel="icon"
+
       type="image/png"
+
       sizes="32x32"
+
       href="/assets/logos/favicon-32x32.png"
+
     />
+
     <link
+
       rel="icon"
+
       type="image/png"
+
       sizes="16x16"
+
       href="/assets/logos/favicon-16x16.png"
+
     />
+
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
+
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
+
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+
       rel="stylesheet"
+
     />
+
   </head>
+
   <body>
+
     <header></header>
+
     <main>
-      <form id="event-code-form">
-        <label for="event-code-input">Event code</label>
-        <input
-          id="event-code-input"
-          name="code"
-          inputmode="numeric"
-          maxlength="11"
-          autocomplete="off"
-        />
-        <button type="submit" class="button button-primary">Continue</button>
-      </form>
+
       <p id="respond-status" hidden></p>
+
       <article id="event-view" hidden>
+
         <h1 id="event-title"></h1>
+
         <p id="event-description"></p>
+
         <p id="event-meta"></p>
+
         <ul id="event-windows"></ul>
+
       </article>
+
       <form id="response-form" hidden>
+
         <fieldset>
+
           <legend>Your details</legend>
+
           <div class="form-field">
+
             <label for="display-name-input">Display name</label>
+
             <input
+
               id="display-name-input"
+
               name="displayName"
+
               placeholder="Display name"
+
               required
+
             />
+
           </div>
+
         </fieldset>
+
         <fieldset>
+
           <legend>When are you available?</legend>
+
           <p>Select the time windows you are available.</p>
+
           <div id="availability-windows">
+
             <div class="availability-window-row">
+
               <input
+
                 type="datetime-local"
+
                 class="availability-window-start"
+
                 aria-label="Availability window start"
+
               />
+
               <input
+
                 type="datetime-local"
+
                 class="availability-window-end"
+
                 aria-label="Availability window end"
+
               />
+
               <input
+
                 type="number"
+
                 class="availability-window-preference"
+
                 aria-label="Availability window preference"
+
                 min="1"
+
                 max="5"
+
               />
+
             </div>
+
           </div>
+
           <button type="button" class="button button-secondary" id="add-availability-window">
+
             + Add availability window
+
           </button>
+
         </fieldset>
-        <button type="submit" class="button button-primary">Submit response</button>
+
+        <button type="submit" class="button button-primary" id="submit-response-btn">
+
+          Submit response
+
+        </button>
+
       </form>
 
+
+
       <div id="respond-success" hidden>
+
         <h2>Thanks, your response was submitted.</h2>
-        <p>You can close this page.</p>
+
+        <p>Save this link to edit your response later.</p>
+
+        <section id="edit-link-section">
+
+          <p>Edit token: <strong id="edit-token"></strong></p>
+
+          <label for="edit-link">Edit link</label>
+
+          <input type="text" id="edit-link" readonly />
+
+          <button type="button" id="copy-edit-link">Copy edit link</button>
+
+        </section>
+
+        <p><a href="/app/">Back to dashboard</a></p>
+
       </div>
+
     </main>
+
   </body>
+
 </html>
+
+
