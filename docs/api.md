@@ -64,6 +64,10 @@ Event code · **403** if results not shared · **404**
 
 **Bearer** · **200:** event + `responses[]` · **401** · **404**
 
+### `PUT /api/events/manage` — update event
+
+**Bearer** · body: `{ title, description, settings }` (same shape as create) · **200:** updated event + `responses[]` · **400** · **401** · **404**
+
 ---
 
 ## Endpoint index
@@ -78,7 +82,7 @@ Event code · **403** if results not shared · **404**
 | `GET` | `/api/events/:eventCode/view` | Event code* | Built | Participant results |
 | `GET` | `/api/events/view` | Bearer | Built | Organizer results |
 | `GET` | `/api/events/manage` | Bearer | Built | Organizer manage |
-| `PUT` | `/api/events/manage` | Bearer | Planned | Edit event settings |
+| `PUT` | `/api/events/manage` | Bearer | Built | Edit event settings |
 
 \*Only when `resultsVisibleToParticipants` is true.
 

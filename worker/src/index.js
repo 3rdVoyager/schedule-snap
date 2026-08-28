@@ -234,6 +234,29 @@ function parseResponseRow(row) {
   };
 }
 
+function buildManageEventPayload(event, rows) {
+  const stored = parseStoredSettings(event.settings) ?? {};
+  return {
+    id: event.id,
+    eventCode: event.event_code,
+    title: event.title,
+    description:
+      typeof stored.description === "string" ? stored.description : "",
+    settings: publicSettings(stored),
+    responses: (rows.results ?? []).map((row) => parseResponseRow(row)),
+    createdAt: event.created_at,
+    updatedAt: event.updated_at,
+  };
+}
+
+async function fetchEventResponses(env, eventId) {
+  return env.DB.prepare(
+    "SELECT * FROM responses WHERE event_id = ? ORDER BY created_at ASC",
+  )
+    .bind(eventId)
+    .all();
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -314,51 +337,65 @@ export default {
         return json({ error: "Invalid organizer secret" }, 404);
       }
 
-      const stored = parseStoredSettings(event.settings) ?? {};
+      const rows = await fetchEventResponses(env, event.id);
+      return json(buildManageEventPayload(event, rows));
+    }
 
-      const rows = await env.DB.prepare(
-        "SELECT * FROM responses WHERE event_id = ? ORDER BY created_at ASC",
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] === "manage" &&
+      !segments[4] &&
+      request.method === "PUT"
+    ) {
+      const manageToken = bearerToken(request);
+
+      if (!manageToken) {
+        return json({ error: "Authorization required" }, 401);
+      }
+
+      const event = await getEventByManageToken(env, manageToken);
+
+      if (event === null) {
+        return json({ error: "Invalid organizer secret" }, 404);
+      }
+
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return json({ error: "Body must be valid JSON" }, 400);
+      }
+
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      if (title.length === 0) {
+        return json({ error: "title is required" }, 400);
+      }
+
+      const description =
+        typeof body.description === "string" ? body.description.trim() : "";
+
+      const validated = validateSettings(body.settings);
+      if (validated.error) {
+        return json({ error: validated.error }, 400);
+      }
+
+      const settingsToStore = JSON.stringify({
+        description,
+        ...validated.settings,
+      });
+
+      const now = new Date().toISOString();
+
+      await env.DB.prepare(
+        "UPDATE events SET title = ?, settings = ?, updated_at = ? WHERE id = ?",
       )
-        .bind(event.id)
-        .all();
+        .bind(title, settingsToStore, now, event.id)
+        .run();
 
-      const responses = (rows.results ?? []).map((row) => {
-        let availability = [];
-        try {
-          availability = JSON.parse(row.availability);
-        } catch {
-          availability = [];
-        }
-        let preferences = null;
-        if (row.preferences != null) {
-          try {
-            preferences = JSON.parse(row.preferences);
-          } catch {
-            preferences = null;
-          }
-        }
-        return {
-          id: row.id,
-          displayName: row.display_name,
-          role: row.role,
-          availability,
-          preferences,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
-        };
-      });
-
-      return json({
-        id: event.id,
-        eventCode: event.event_code,
-        title: event.title,
-        description:
-          typeof stored.description === "string" ? stored.description : "",
-        settings: publicSettings(stored),
-        responses,
-        createdAt: event.created_at,
-        updatedAt: event.updated_at,
-      });
+      const updated = await getEventByManageToken(env, manageToken);
+      const rows = await fetchEventResponses(env, event.id);
+      return json(buildManageEventPayload(updated, rows));
     }
 
     if (

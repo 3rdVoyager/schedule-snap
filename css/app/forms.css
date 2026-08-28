@@ -96,10 +96,24 @@ main form button[type="submit"] {
   align-self: flex-start;
 }
 
-#event-code-form,
-#organizer-token-form {
-  padding: var(--space-lg);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  background: var(--surface-card);
+main form .form-field-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+main form .form-field-checkbox input {
+  width: auto;
+}
+
+main article > section {
+  margin-bottom: var(--space-xl);
+}
+
+.manage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }

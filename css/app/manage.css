@@ -1,0 +1,52 @@
+.manage-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
+.manage-status {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--button-border-radius);
+  background: var(--secondary-color-light);
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color-dark);
+  font-size: var(--text-size-small);
+}
+
+.manage-status[hidden] {
+  display: none !important;
+}
+
+#event-code {
+  font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+  letter-spacing: 0.08em;
+}
+
+.manage-responses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.manage-responses > p {
+  margin: 0;
+  color: var(--text-color-light);
+  font-size: var(--text-size-small);
+}
+
+.manage-responses .dashboard-list {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+.manage-responses .dashboard-list-item {
+  padding: var(--space-md) var(--space-lg);
+}
+
+.manage-actions {
+  margin: 0;
+}

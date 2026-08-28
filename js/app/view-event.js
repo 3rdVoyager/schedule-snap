@@ -70,12 +70,6 @@ async function loadOrganizerView(token) {
       setActiveOrganizerEventId(entry.id);
     }
 
-    if (deepLink.token.length === 32) {
-      const url = new URL(window.location.href);
-      url.hash = "";
-      history.replaceState(null, "", url);
-    }
-
     statusEl.hidden = true;
     renderView(data);
   } catch {
