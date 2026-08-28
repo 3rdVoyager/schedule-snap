@@ -36,9 +36,11 @@ eventCodeForm.addEventListener("submit", (e) => {
   }
 });
 
-responseForm.addEventListener("submit", (e) => {
+responseForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!currentEvent || !currentEventCode) return;
+  statusEl.hidden = true;
+  statusEl.textContent = "";
   const displayName = document
     .querySelector("#display-name-input")
     .value.trim();
@@ -66,7 +68,38 @@ responseForm.addEventListener("submit", (e) => {
     availability: availability.map(({ start, end }) => ({ start, end })),
     preferences: null,
   };
-  console.log(payload);
+
+  if (!displayName) return;
+  if (payload.availability.length === 0) {
+    statusEl.hidden = false;
+    statusEl.textContent = "Add at least one availability window.";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/events/${currentEventCode}/responses`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      statusEl.hidden = false;
+      statusEl.textContent = data.error ?? "Could not submit response";
+      return;
+    }
+
+    responseForm.hidden = true;
+    document.querySelector("#respond-success").hidden = false;
+  } catch {
+    statusEl.hidden = false;
+    statusEl.textContent = "Could not reach the server";
+  }
 });
 
 async function loadEvent(eventCode) {

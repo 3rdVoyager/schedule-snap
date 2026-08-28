@@ -41,6 +41,15 @@ function validateTimeRange(range, fieldName) {
   return null;
 }
 
+function isInsideWindow(range, window) {
+  const rangeStart = parseUtcInstant(range.start);
+  const rangeEnd = parseUtcInstant(range.end);
+  const windowStart = parseUtcInstant(window.start);
+  const windowEnd = parseUtcInstant(window.end);
+  if (!rangeStart || !rangeEnd || !windowStart || !windowEnd) return false;
+  return rangeStart >= windowStart && rangeEnd <= windowEnd;
+}
+
 function validateSettings(rawSettings) {
   if (!rawSettings || typeof rawSettings !== "object") {
     return { error: "settings is required" };
@@ -299,6 +308,22 @@ export default {
       const validated = validateAvailability(availability);
       if (validated.error) {
         return json({ error: validated.error }, 400);
+      }
+
+      const stored = parseStoredSettings(event.settings) ?? {};
+      const schedulingWindows = stored.schedulingWindows ?? [];
+
+      for (let i = 0; i < validated.availability.length; i++) {
+        const range = validated.availability[i];
+        const inside = schedulingWindows.some((w) => isInsideWindow(range, w));
+        if (!inside) {
+          return json(
+            {
+              error: `availability[${i}] must fall within a scheduling window`,
+            },
+            400,
+          );
+        }
       }
 
       const now = new Date().toISOString();
