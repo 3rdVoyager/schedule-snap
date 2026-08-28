@@ -1,24 +1,20 @@
-// testing/seed-event.js — run: node testing/seed-event.js
-const payload = {
-  title: "Q3 Planning",
-  description: "Core team availability for quarterly planning.",
-  settings: {
-    timezone: "America/New_York",
-    durationMinutes: 90,
-    schedulingWindows: [
-      { start: "2026-09-02T13:00:00.000Z", end: "2026-09-02T16:00:00.000Z" },
-      { start: "2026-09-03T18:00:00.000Z", end: "2026-09-03T21:00:00.000Z" },
-      { start: "2026-09-05T14:00:00.000Z", end: "2026-09-05T20:00:00.000Z" },
-    ],
-    responseWindow: { opensAt: null, closesAt: null },
-    allowResponseEdits: true,
-    resultsVisibleToParticipants: false,
-  },
-};
+// Create a sample event via the local API. Requires: npm run dev
+// Usage: npm run seed:event
 
-const res = await fetch("http://127.0.0.1:8787/api/events", {
+import { API_URL, APP_ORIGIN, sampleEventPayload } from "./config.js";
+
+const res = await fetch(`${API_URL}/api/events`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
+  body: JSON.stringify(sampleEventPayload),
 });
-console.log(await res.json());
+
+const data = await res.json();
+
+if (!res.ok) {
+  console.error("Seed failed:", data.error ?? data);
+  process.exit(1);
+}
+
+console.log(JSON.stringify(data, null, 2));
+console.log(`\nRespond: ${APP_ORIGIN}/app/respond/?code=${data.eventCode}`);
