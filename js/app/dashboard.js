@@ -3,7 +3,7 @@ import {
   getMyResponses,
   getOrganizerEvents,
   updateOrganizerEventTitle,
-} from "./registry.js";
+} from "./storage.js";
 import {
   normalizeEventCode,
   normalizeManageToken,

@@ -1,5 +1,5 @@
 import { API_URL } from "./config.js";
-import { removeOrganizerEvent, updateOrganizerEventTitle } from "./registry.js";
+import { removeOrganizerEvent, updateOrganizerEventTitle } from "./storage.js";
 import {
   getActiveOrganizerEventId,
   redirectToDashboard,

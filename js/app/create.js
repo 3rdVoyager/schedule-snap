@@ -1,6 +1,6 @@
 import { API_URL } from "./config.js";
 import { zonedToUtcIso } from "./time.js";
-import { addMyResponse } from "./registry.js";
+import { addMyResponse } from "./storage.js";
 import { registerOrganizerEvent } from "./session.js";
 
 const createEventForm = document.querySelector("#create-event-form");

@@ -36,7 +36,7 @@ Pages without credentials redirect to `/app/?next=…`. Deep links (`?code=`, `#
 
 **Manage token:** 32 hex, once at create. **Edit token:** 32 hex, once at response submit.
 
-## Local registry (device-only)
+## Local storage (device-only)
 
 ```json
 {

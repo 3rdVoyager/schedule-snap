@@ -1,6 +1,6 @@
 import { API_URL } from "./config.js";
 import { formatInZone, utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
-import { addMyResponse, removeMyResponse, updateResponseMeta } from "./registry.js";
+import { addMyResponse, removeMyResponse, updateResponseMeta } from "./storage.js";
 import {
   parseDeepLink,
   redirectToDashboard,

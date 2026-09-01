@@ -2,7 +2,7 @@ import {
   addOrganizerEvent,
   getOrganizerEventById,
   getOrganizerEventByToken,
-} from "./registry.js";
+} from "./storage.js";
 
 const ACTIVE_ORGANIZER_KEY = "schedulesnap:activeOrganizerEventId";
 const PARTICIPANT_CODE_KEY = "schedulesnap:participantEventCode";
