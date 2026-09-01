@@ -12,7 +12,7 @@ header.innerHTML = `
             <li><a href="/how-it-works">How It Works</a></li>
             <li><a href="/features">Features</a></li>
         </ul>
-        <a href="/app/" class="button button-secondary">Open App</a>
+        <a href="/app/" class="button button-primary">Open App</a>
     </nav>
 `;
 
