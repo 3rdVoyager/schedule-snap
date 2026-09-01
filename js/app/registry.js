@@ -106,3 +106,21 @@ export function getOrganizerEventByToken(manageToken) {
 export function getResponseByEditToken(editToken) {
   return load().myResponses.find((r) => r.editToken === editToken) ?? null;
 }
+
+export function removeOrganizerEvent(id) {
+  const data = load();
+  const index = data.organizerEvents.findIndex((e) => e.id === id);
+  if (index < 0) return false;
+  data.organizerEvents.splice(index, 1);
+  save(data);
+  return true;
+}
+
+export function removeMyResponse(responseId) {
+  const data = load();
+  const index = data.myResponses.findIndex((r) => r.responseId === responseId);
+  if (index < 0) return false;
+  data.myResponses.splice(index, 1);
+  save(data);
+  return true;
+}

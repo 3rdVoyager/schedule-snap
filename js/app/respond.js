@@ -1,6 +1,6 @@
 import { API_URL } from "./config.js";
 import { formatInZone, utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
-import { addMyResponse, updateResponseMeta } from "./registry.js";
+import { addMyResponse, removeMyResponse, updateResponseMeta } from "./registry.js";
 import {
   parseDeepLink,
   redirectToDashboard,
@@ -12,6 +12,7 @@ const statusEl = document.querySelector("#respond-status");
 const view = document.querySelector("#event-view");
 const responseForm = document.querySelector("#response-form");
 const successEl = document.querySelector("#respond-success");
+const unlinkSection = document.querySelector("#unlink-section");
 
 let currentEvent = null;
 let currentEventCode = "";
@@ -120,6 +121,9 @@ async function submitCreate(payload, displayName) {
       currentEvent.settings.resultsVisibleToParticipants === true,
   });
 
+  currentResponseId = data.id;
+  showUnlinkSection();
+
   const editLink = `${window.location.origin}/app/respond/#edit=${data.editToken}`;
   document.querySelector("#edit-link").value = editLink;
   document.querySelector("#edit-token").textContent = data.editToken;
@@ -181,6 +185,8 @@ async function loadForEdit(token) {
 
     statusEl.hidden = true;
     renderEvent(currentEvent);
+
+    showUnlinkSection();
 
     if (data.settings.allowResponseEdits === false) {
       responseForm.hidden = true;
@@ -285,3 +291,15 @@ document.querySelector("#copy-edit-link")?.addEventListener("click", async () =>
   const input = document.querySelector("#edit-link");
   await navigator.clipboard.writeText(input.value);
 });
+
+document.querySelector("#unlink-response").addEventListener("click", () => {
+  if (!currentResponseId) return;
+  removeMyResponse(currentResponseId);
+  window.location.href = "/app/";
+});
+
+function showUnlinkSection() {
+  if (currentResponseId) {
+    unlinkSection.hidden = false;
+  }
+}

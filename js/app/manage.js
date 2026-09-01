@@ -1,6 +1,7 @@
 import { API_URL } from "./config.js";
-import { updateOrganizerEventTitle } from "./registry.js";
+import { removeOrganizerEvent, updateOrganizerEventTitle } from "./registry.js";
 import {
+  getActiveOrganizerEventId,
   redirectToDashboard,
   registerOrganizerEvent,
   resolveManageToken,
@@ -13,6 +14,7 @@ const view = document.querySelector("#manage-view");
 const form = document.querySelector("#manage-event-form");
 
 let currentManageToken = "";
+let currentEventId = "";
 
 const manageToken = resolveManageToken();
 
@@ -45,6 +47,15 @@ document
     const input = document.querySelector("#organizer-link");
     await navigator.clipboard.writeText(input.value);
   });
+
+document.querySelector("#unlink-event").addEventListener("click", () => {
+  if (!currentEventId) return;
+  removeOrganizerEvent(currentEventId);
+  if (getActiveOrganizerEventId() === currentEventId) {
+    setActiveOrganizerEventId("");
+  }
+  window.location.href = "/app/";
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -123,6 +134,7 @@ async function loadManage(manageToken) {
     }
 
     const entry = registerOrganizerEvent(data, manageToken);
+    currentEventId = data.id;
     setActiveOrganizerEventId(entry.id);
 
     statusEl.hidden = true;

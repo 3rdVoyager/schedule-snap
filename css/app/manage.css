@@ -50,3 +50,17 @@
 .manage-actions {
   margin: 0;
 }
+
+.manage-unlink > p,
+.respond-unlink > p {
+  margin: 0;
+  color: var(--text-color-light);
+  font-size: var(--text-size-small);
+}
+
+.respond-unlink {
+  margin-top: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
