@@ -3,14 +3,15 @@ import {
   formatInZone,
   formatMinutesLabel,
   getDayWindowSegments,
+  intersectWindowWithDay,
   isDayInSchedulingWindows,
-  minutesInZone,
   rangeFromDayMinutes,
 } from "./time.js";
 
 const SLOT_MINUTES = 15;
 const SLOT_HEIGHT_PX = 24;
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const FULL_DAY_SEGMENT = { startMinutes: 0, endMinutes: 24 * 60 };
 
 function snapMinute(minute, mode) {
   if (mode === "ceil") {
@@ -21,10 +22,13 @@ function snapMinute(minute, mode) {
 
 /**
  * @param {HTMLElement} container
- * @param {{ timezone: string, schedulingWindows: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], onChange?: () => void }} options
+ * @param {{ mode?: "availability" | "scheduling", timezone: string, schedulingWindows?: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], onChange?: () => void }} options
  */
 export function createCalendar(container, options) {
-  const { timezone, schedulingWindows, onChange } = options;
+  const mode = options.mode ?? "availability";
+  let timezone = options.timezone;
+  const schedulingWindows = options.schedulingWindows ?? [];
+  const { onChange } = options;
   let ranges = [...(options.initialRanges ?? [])];
   let viewYear;
   let viewMonth;
@@ -32,9 +36,13 @@ export function createCalendar(container, options) {
   let dragStartSlot = null;
   let dragEndSlot = null;
   let isDragging = false;
+  let lastRenderedDay = null;
 
   const root = document.createElement("div");
   root.className = "calendar";
+  if (mode === "scheduling") {
+    root.classList.add("calendar--scheduling");
+  }
   container.replaceChildren(root);
 
   initViewMonth();
@@ -59,13 +67,34 @@ export function createCalendar(container, options) {
   document.addEventListener("touchmove", onDocTouchMove, { passive: false });
 
   function initViewMonth() {
-    const first =
-      schedulingWindows.length > 0
-        ? dateKeyInZone(schedulingWindows[0].start, timezone)
-        : dateKeyInZone(new Date().toISOString(), timezone);
+    if (ranges.length > 0) {
+      const first = dateKeyInZone(ranges[0].start, timezone);
+      const [y, m] = first.split("-").map(Number);
+      viewYear = y;
+      viewMonth = m - 1;
+      return;
+    }
+    if (mode === "scheduling" || schedulingWindows.length === 0) {
+      const first = dateKeyInZone(new Date().toISOString(), timezone);
+      const [y, m] = first.split("-").map(Number);
+      viewYear = y;
+      viewMonth = m - 1;
+      return;
+    }
+    const first = dateKeyInZone(schedulingWindows[0].start, timezone);
     const [y, m] = first.split("-").map(Number);
     viewYear = y;
     viewMonth = m - 1;
+  }
+
+  function isDaySelectable(dayKeyStr) {
+    if (mode === "scheduling") return true;
+    return isDayInSchedulingWindows(dayKeyStr, schedulingWindows, timezone);
+  }
+
+  function getSegmentsForDay(dayKeyStr) {
+    if (mode === "scheduling") return [FULL_DAY_SEGMENT];
+    return getDayWindowSegments(schedulingWindows, dayKeyStr, timezone);
   }
 
   function autoSelectFirstDay() {
@@ -78,7 +107,7 @@ export function createCalendar(container, options) {
     }
     for (const w of schedulingWindows) {
       const key = dateKeyInZone(w.start, timezone);
-      if (isDayInSchedulingWindows(key, schedulingWindows, timezone)) {
+      if (isDaySelectable(key)) {
         selectedDay = key;
         const [y, m] = key.split("-").map(Number);
         viewYear = y;
@@ -122,13 +151,22 @@ export function createCalendar(container, options) {
     );
   }
 
+  function getRangeMinuteBoundsOnDay(range, dayKeyStr) {
+    const clipped = intersectWindowWithDay(range, dayKeyStr, timezone);
+    if (!clipped) return null;
+    return {
+      start: snapMinute(clipped.startMinutes, "floor"),
+      end: snapMinute(clipped.endMinutes, "ceil"),
+    };
+  }
+
   function isMinuteOccupied(minute, dayKeyStr, ignoreNewDrag = false) {
     const end = minute + SLOT_MINUTES;
     const dayRanges = rangesOnDay(dayKeyStr);
     return dayRanges.some((r) => {
-      const rs = snapMinute(minutesInZone(r.start, timezone), "floor");
-      const re = snapMinute(minutesInZone(r.end, timezone), "ceil");
-      return minute < re && end > rs;
+      const bounds = getRangeMinuteBoundsOnDay(r, dayKeyStr);
+      if (!bounds) return false;
+      return minute < bounds.end && end > bounds.start;
     });
   }
 
@@ -153,10 +191,9 @@ export function createCalendar(container, options) {
       (r) => dateKeyInZone(r.start, timezone) !== dayKeyStr,
     );
     const dayIntervals = [
-      ...rangesOnDay(dayKeyStr).map((r) => ({
-        start: minutesInZone(r.start, timezone),
-        end: minutesInZone(r.end, timezone),
-      })),
+      ...rangesOnDay(dayKeyStr)
+        .map((r) => getRangeMinuteBoundsOnDay(r, dayKeyStr))
+        .filter(Boolean),
       { start: lo, end: endMinute },
     ];
     const merged = mergeMinuteIntervals(dayIntervals);
@@ -198,6 +235,12 @@ export function createCalendar(container, options) {
   }
 
   function render() {
+    let scrollTopToRestore = 0;
+    const existingGrid = root.querySelector(".calendar-time-grid");
+    if (existingGrid && selectedDay && selectedDay === lastRenderedDay) {
+      scrollTopToRestore = existingGrid.scrollTop;
+    }
+
     root.replaceChildren();
 
     const layout = document.createElement("div");
@@ -273,16 +316,12 @@ export function createCalendar(container, options) {
 
     for (let d = 1; d <= totalDays; d++) {
       const key = dayKey(viewYear, viewMonth, d);
-      const inWindow = isDayInSchedulingWindows(
-        key,
-        schedulingWindows,
-        timezone,
-      );
+      const selectable = isDaySelectable(key);
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "calendar-day";
       btn.textContent = String(d);
-      if (!inWindow) {
+      if (!selectable) {
         btn.classList.add("calendar-day--disabled");
         btn.disabled = true;
       } else {
@@ -303,20 +342,26 @@ export function createCalendar(container, options) {
     monthSection.appendChild(grid);
     layout.appendChild(monthSection);
 
-    if (
-      selectedDay &&
-      isDayInSchedulingWindows(selectedDay, schedulingWindows, timezone)
-    ) {
+    if (selectedDay && isDaySelectable(selectedDay)) {
       layout.appendChild(buildTimePanel());
     } else {
       const placeholder = document.createElement("div");
       placeholder.className =
         "calendar-time-panel calendar-time-panel--empty text-sub text-center";
-      placeholder.textContent = "Select a highlighted day to set your availability.";
+      placeholder.textContent =
+        mode === "scheduling"
+          ? "Select a day to add a scheduling window."
+          : "Select a highlighted day to set your availability.";
       layout.appendChild(placeholder);
     }
 
     root.appendChild(layout);
+
+    const timeGrid = root.querySelector(".calendar-time-grid");
+    if (timeGrid) {
+      timeGrid.scrollTop = scrollTopToRestore;
+    }
+    lastRenderedDay = selectedDay;
   }
 
   function rowOffsetPx(_grid, minute, baseMin) {
@@ -331,12 +376,14 @@ export function createCalendar(container, options) {
     overlay.style.height = `${((maxMinute - baseMin) / SLOT_MINUTES) * SLOT_HEIGHT_PX}px`;
     overlay.replaceChildren();
     for (const range of rangesOnDay(selectedDay)) {
+      const bounds = getRangeMinuteBoundsOnDay(range, selectedDay);
+      if (!bounds) continue;
       appendBlock(
         overlay,
         _grid,
         baseMin,
-        snapMinute(minutesInZone(range.start, timezone), "floor"),
-        snapMinute(minutesInZone(range.end, timezone), "ceil"),
+        bounds.start,
+        bounds.end,
         "calendar-time-block",
         range,
       );
@@ -375,7 +422,10 @@ export function createCalendar(container, options) {
     block.style.height = `${heightPx}px`;
     if (rangeRef) {
       block.title = "Click to remove";
-      block.setAttribute("aria-label", "Remove availability block");
+      block.setAttribute(
+        "aria-label",
+        mode === "scheduling" ? "Remove scheduling window" : "Remove availability block",
+      );
       block.addEventListener("click", (e) => {
         e.stopPropagation();
         removeRange(rangeRef);
@@ -396,14 +446,13 @@ export function createCalendar(container, options) {
 
     const hint = document.createElement("p");
     hint.className = "text-sub";
-    hint.textContent = "Drag empty slots to add time. Click a block to remove it.";
+    hint.textContent =
+      mode === "scheduling"
+        ? "Drag on the grid to add a window. Click a block to remove it."
+        : "Drag empty slots to add time. Click a block to remove it.";
     panel.appendChild(hint);
 
-    const segments = getDayWindowSegments(
-      schedulingWindows,
-      selectedDay,
-      timezone,
-    );
+    const segments = getSegmentsForDay(selectedDay);
     if (segments.length === 0) return panel;
 
     const minMinute = snapMinute(
@@ -497,11 +546,7 @@ export function createCalendar(container, options) {
 
   function endDrag() {
     if (!isDragging || dragStartSlot === null || !selectedDay) return;
-    const segments = getDayWindowSegments(
-      schedulingWindows,
-      selectedDay,
-      timezone,
-    );
+    const segments = getSegmentsForDay(selectedDay);
     const lo = Math.min(dragStartSlot, dragEndSlot ?? dragStartSlot);
     const hi = Math.max(dragStartSlot, dragEndSlot ?? dragStartSlot);
     const endMinute = hi + SLOT_MINUTES;
@@ -526,11 +571,7 @@ export function createCalendar(container, options) {
     const grid = root.querySelector(".calendar-time-grid");
     const overlay = root.querySelector(".calendar-time-overlay");
     if (!overlay || !grid || !selectedDay) return;
-    const segments = getDayWindowSegments(
-      schedulingWindows,
-      selectedDay,
-      timezone,
-    );
+    const segments = getSegmentsForDay(selectedDay);
     const minMinute = snapMinute(
       Math.min(...segments.map((s) => s.startMinutes)),
       "floor",
@@ -554,6 +595,10 @@ export function createCalendar(container, options) {
         viewYear = y;
         viewMonth = m - 1;
       }
+      render();
+    },
+    setTimezone(nextTimezone) {
+      timezone = nextTimezone;
       render();
     },
     destroy() {

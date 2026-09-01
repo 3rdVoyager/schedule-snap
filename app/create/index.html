@@ -109,23 +109,7 @@
             availability. Think of this as the windows of possible times the
             event could be scheduled.
           </p>
-          <div id="scheduling-windows">
-            <div class="scheduling-window-row">
-              <input
-                type="datetime-local"
-                class="text-input scheduling-window-start"
-                aria-label="Scheduling window start"
-              />
-              <input
-                type="datetime-local"
-                class="text-input scheduling-window-end"
-                aria-label="Scheduling window end"
-              />
-            </div>
-          </div>
-          <button type="button" class="button button-primary-outline" id="add-scheduling-window">
-            + Add scheduling window
-          </button>
+          <div id="scheduling-calendar"></div>
         </fieldset>
         <!-- Future: responseWindow, allowResponseEdits, resultsVisibleToParticipants -->
         <button type="submit" class="button button-primary">Create Event</button>

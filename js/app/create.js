@@ -1,21 +1,30 @@
 import { API_URL } from "./config.js";
-import { zonedToUtcIso } from "./time.js";
+import { createCalendar } from "./calendar.js";
 import { addMyResponse } from "./storage.js";
 import { registerOrganizerEvent } from "./session.js";
 import { showToast } from "./toast.js";
 
 const createEventForm = document.querySelector("#create-event-form");
+const timezoneSelect = document.querySelector("#timezone");
+const calendarMount = document.querySelector("#scheduling-calendar");
 
-document
-  .querySelector("#add-scheduling-window")
-  .addEventListener("click", () => {
-    const template = document.querySelector(
-      "#scheduling-windows .scheduling-window-row",
-    );
-    const clone = template.cloneNode(true);
-    clone.querySelectorAll("input").forEach((input) => (input.value = ""));
-    document.querySelector("#scheduling-windows").appendChild(clone);
+let schedulingCalendar = null;
+
+function initSchedulingCalendar(initialRanges = []) {
+  schedulingCalendar?.destroy();
+  schedulingCalendar = createCalendar(calendarMount, {
+    mode: "scheduling",
+    timezone: timezoneSelect.value,
+    initialRanges,
   });
+}
+
+initSchedulingCalendar();
+
+timezoneSelect.addEventListener("change", () => {
+  const ranges = schedulingCalendar?.getRanges() ?? [];
+  initSchedulingCalendar(ranges);
+});
 
 function copyInputValue(inputId, buttonId, label) {
   document.querySelector(buttonId).addEventListener("click", async () => {
@@ -32,19 +41,13 @@ createEventForm.addEventListener("submit", async (event) => {
   const title = document.querySelector("#title").value;
   const description = document.querySelector("#description").value;
   const durationMinutes = Number(document.querySelector("#duration").value);
-  const timezone = document.querySelector("#timezone").value;
-  const schedulingWindows = [
-    ...document.querySelectorAll("#scheduling-windows .scheduling-window-row"),
-  ]
-    .map((windowRow) => ({
-      start: windowRow.querySelector(".scheduling-window-start").value,
-      end: windowRow.querySelector(".scheduling-window-end").value,
-    }))
-    .filter((window) => window.start && window.end)
-    .map((window) => ({
-      start: zonedToUtcIso(window.start, timezone),
-      end: zonedToUtcIso(window.end, timezone),
-    }));
+  const timezone = timezoneSelect.value;
+  const schedulingWindows = schedulingCalendar?.getRanges() ?? [];
+
+  if (schedulingWindows.length === 0) {
+    showToast("Add at least one scheduling window.", { type: "error" });
+    return;
+  }
 
   const payload = {
     title,

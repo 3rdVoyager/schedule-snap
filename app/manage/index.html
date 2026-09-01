@@ -157,27 +157,11 @@
           </fieldset>
           <fieldset class="card card-normal section">
             <legend class="text-heading">When can participants schedule their availability?</legend>
-            <div id="scheduling-windows">
-              <div class="scheduling-window-row">
-                <input
-                  type="datetime-local"
-                  class="text-input scheduling-window-start"
-                  aria-label="Scheduling window start"
-                />
-                <input
-                  type="datetime-local"
-                  class="text-input scheduling-window-end"
-                  aria-label="Scheduling window end"
-                />
-              </div>
-            </div>
-            <button
-              type="button"
-              class="button button-primary-outline"
-              id="add-scheduling-window"
-            >
-              + Add scheduling window
-            </button>
+            <p class="text-sub">
+              Drag on the calendar to add time windows in which respondents can
+              submit availability.
+            </p>
+            <div id="scheduling-calendar"></div>
           </fieldset>
           <fieldset class="card card-normal section">
             <legend class="text-heading">Participant options</legend>

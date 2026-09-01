@@ -9,15 +9,18 @@ import {
   setActiveOrganizerEventId,
 } from "./session.js";
 import { populatePageHeader } from "./page-header.js";
+import { createCalendar } from "./calendar.js";
 import { initTabs } from "./tabs.js";
 import { showToast } from "./toast.js";
-import { utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
 
 const view = document.querySelector("#manage-view");
 const form = document.querySelector("#manage-event-form");
+const timezoneSelect = document.querySelector("#timezone");
+const calendarMount = document.querySelector("#scheduling-calendar");
 
 initTabs(document.querySelector("#manage-tabs"), { defaultTab: "links" });
 
+let schedulingCalendar = null;
 let currentManageToken = "";
 let currentEventId = "";
 
@@ -30,16 +33,19 @@ if (manageToken.length !== 32) {
   loadManage(manageToken);
 }
 
-document
-  .querySelector("#add-scheduling-window")
-  .addEventListener("click", () => {
-    const template = document.querySelector(
-      "#scheduling-windows .scheduling-window-row",
-    );
-    const clone = template.cloneNode(true);
-    clone.querySelectorAll("input").forEach((input) => (input.value = ""));
-    document.querySelector("#scheduling-windows").appendChild(clone);
+function initSchedulingCalendar(initialRanges = []) {
+  schedulingCalendar?.destroy();
+  schedulingCalendar = createCalendar(calendarMount, {
+    mode: "scheduling",
+    timezone: timezoneSelect.value,
+    initialRanges,
   });
+}
+
+timezoneSelect.addEventListener("change", () => {
+  const ranges = schedulingCalendar?.getRanges() ?? [];
+  initSchedulingCalendar(ranges);
+});
 
 document.querySelector("#copy-respond-link").addEventListener("click", async () => {
   const input = document.querySelector("#respond-link");
@@ -98,19 +104,13 @@ document.querySelector("#delete-event").addEventListener("click", async () => {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const timezone = document.querySelector("#timezone").value;
-  const schedulingWindows = [
-    ...document.querySelectorAll("#scheduling-windows .scheduling-window-row"),
-  ]
-    .map((windowRow) => ({
-      start: windowRow.querySelector(".scheduling-window-start").value,
-      end: windowRow.querySelector(".scheduling-window-end").value,
-    }))
-    .filter((window) => window.start && window.end)
-    .map((window) => ({
-      start: zonedToUtcIso(window.start, timezone),
-      end: zonedToUtcIso(window.end, timezone),
-    }));
+  const timezone = timezoneSelect.value;
+  const schedulingWindows = schedulingCalendar?.getRanges() ?? [];
+
+  if (schedulingWindows.length === 0) {
+    showToast("Add at least one scheduling window.", { type: "error" });
+    return;
+  }
 
   const payload = {
     title: document.querySelector("#title").value.trim(),
@@ -201,28 +201,7 @@ function populateForm(data) {
   document.querySelector("#results-visible").checked =
     settings.resultsVisibleToParticipants;
 
-  const container = document.querySelector("#scheduling-windows");
-  const template = container.querySelector(".scheduling-window-row");
-  container.replaceChildren();
-
-  const windows = settings.schedulingWindows ?? [];
-  if (windows.length === 0) {
-    container.appendChild(template.cloneNode(true));
-    return;
-  }
-
-  for (const window of windows) {
-    const row = template.cloneNode(true);
-    row.querySelector(".scheduling-window-start").value = utcToDatetimeLocal(
-      window.start,
-      timezone,
-    );
-    row.querySelector(".scheduling-window-end").value = utcToDatetimeLocal(
-      window.end,
-      timezone,
-    );
-    container.appendChild(row);
-  }
+  initSchedulingCalendar(settings.schedulingWindows ?? []);
 }
 
 function renderResponses(data) {
