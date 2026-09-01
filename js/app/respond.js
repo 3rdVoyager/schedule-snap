@@ -122,6 +122,7 @@ async function submitCreate(payload, displayName) {
   });
 
   currentResponseId = data.id;
+  editToken = data.editToken;
   showUnlinkSection();
 
   const editLink = `${window.location.origin}/app/respond/#edit=${data.editToken}`;
@@ -296,6 +297,39 @@ document.querySelector("#unlink-response").addEventListener("click", () => {
   if (!currentResponseId) return;
   removeMyResponse(currentResponseId);
   window.location.href = "/app/";
+});
+
+document.querySelector("#delete-response").addEventListener("click", async () => {
+  if (!editToken) return;
+  if (
+    !confirm(
+      "Delete your response permanently? This cannot be undone.",
+    )
+  ) {
+    return;
+  }
+
+  statusEl.hidden = false;
+  statusEl.textContent = "Deleting…";
+
+  try {
+    const response = await fetch(`${API_URL}/api/responses/edit`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${editToken}` },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      statusEl.textContent = data.error ?? "Could not delete response";
+      return;
+    }
+
+    if (currentResponseId) {
+      removeMyResponse(currentResponseId);
+    }
+    window.location.href = "/app/";
+  } catch {
+    statusEl.textContent = "Could not reach the server";
+  }
 });
 
 function showUnlinkSection() {

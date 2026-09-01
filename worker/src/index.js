@@ -1,12 +1,13 @@
 import { requireBearer } from "./auth.js";
 import { createEvent } from "./create.js";
 import { corsHeaders, json } from "./lib.js";
-import { getManageEvent, updateManageEvent } from "./manage.js";
+import { getManageEvent, updateManageEvent, deleteManageEvent } from "./manage.js";
 import {
   getEventByCode,
   getResponseForEdit,
   submitResponse,
   updateResponse,
+  deleteResponse,
 } from "./respond.js";
 import { getOrganizerView, getParticipantView } from "./view.js";
 
@@ -52,6 +53,19 @@ export default {
       const auth = requireBearer(request);
       if (auth.error) return auth.error;
       return updateManageEvent(request, env, auth.token);
+    }
+
+    // DELETE /api/events/manage
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] === "manage" &&
+      !segments[4] &&
+      request.method === "DELETE"
+    ) {
+      const auth = requireBearer(request);
+      if (auth.error) return auth.error;
+      return deleteManageEvent(env, auth.token);
     }
 
     // GET /api/events/view
@@ -114,6 +128,19 @@ export default {
       const auth = requireBearer(request);
       if (auth.error) return auth.error;
       return updateResponse(request, env, auth.token);
+    }
+
+    // DELETE /api/responses/edit
+    if (
+      segments[1] === "api" &&
+      segments[2] === "responses" &&
+      segments[3] === "edit" &&
+      !segments[4] &&
+      request.method === "DELETE"
+    ) {
+      const auth = requireBearer(request);
+      if (auth.error) return auth.error;
+      return deleteResponse(env, auth.token);
     }
 
     // POST /api/events/:eventCode/responses

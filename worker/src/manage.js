@@ -61,3 +61,20 @@ export async function updateManageEvent(request, env, manageToken) {
   const rows = await fetchEventResponses(env, event.id);
   return json(buildManageEventPayload(updated, rows));
 }
+
+export async function deleteManageEvent(env, manageToken) {
+  const event = await getEventByManageToken(env, manageToken);
+
+  if (event === null) {
+    return json({ error: "Invalid organizer secret" }, 404);
+  }
+
+  await env.DB.prepare("DELETE FROM responses WHERE event_id = ?")
+    .bind(event.id)
+    .run();
+  await env.DB.prepare("DELETE FROM events WHERE id = ?")
+    .bind(event.id)
+    .run();
+
+  return json({ ok: true });
+}

@@ -68,6 +68,14 @@ Event code · **403** if results not shared · **404**
 
 **Bearer** · body: `{ title, description, settings }` (same shape as create) · **200:** updated event + `responses[]` · **400** · **401** · **404**
 
+### `DELETE /api/events/manage` — delete event
+
+**Bearer** · **200:** `{ ok: true }` · **401** · **404** — permanently deletes event and all responses
+
+### `DELETE /api/responses/edit` — delete own response
+
+**Bearer** (edit token) · **200:** `{ ok: true }` · **401** · **404**
+
 ---
 
 ## Endpoint index
@@ -83,6 +91,8 @@ Event code · **403** if results not shared · **404**
 | `GET` | `/api/events/view` | Bearer | Built | Organizer results |
 | `GET` | `/api/events/manage` | Bearer | Built | Organizer manage |
 | `PUT` | `/api/events/manage` | Bearer | Built | Edit event settings |
+| `DELETE` | `/api/events/manage` | Bearer | Built | Delete event + responses |
+| `DELETE` | `/api/responses/edit` | Bearer (edit) | Built | Delete own response |
 
 \*Only when `resultsVisibleToParticipants` is true.
 

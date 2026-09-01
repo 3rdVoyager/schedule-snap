@@ -57,6 +57,40 @@ document.querySelector("#unlink-event").addEventListener("click", () => {
   window.location.href = "/app/";
 });
 
+document.querySelector("#delete-event").addEventListener("click", async () => {
+  if (!currentEventId) return;
+  if (
+    !confirm(
+      "Delete this event and all responses permanently? This cannot be undone.",
+    )
+  ) {
+    return;
+  }
+
+  statusEl.hidden = false;
+  statusEl.textContent = "Deleting…";
+
+  try {
+    const response = await fetch(`${API_URL}/api/events/manage`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${currentManageToken}` },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      statusEl.textContent = data.error ?? "Could not delete event";
+      return;
+    }
+
+    removeOrganizerEvent(currentEventId);
+    if (getActiveOrganizerEventId() === currentEventId) {
+      setActiveOrganizerEventId("");
+    }
+    window.location.href = "/app/";
+  } catch {
+    statusEl.textContent = "Could not reach the server";
+  }
+});
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   statusEl.hidden = false;

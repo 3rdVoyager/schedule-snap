@@ -176,3 +176,16 @@ export async function submitResponse(request, env, eventCode) {
 
   return json({ id, editToken }, 201);
 }
+
+export async function deleteResponse(env, editToken) {
+  const row = await getResponseWithEventByEditToken(env, editToken);
+  if (row === null) {
+    return json({ error: "Invalid edit token" }, 404);
+  }
+
+  await env.DB.prepare("DELETE FROM responses WHERE id = ?")
+    .bind(row.id)
+    .run();
+
+  return json({ ok: true });
+}

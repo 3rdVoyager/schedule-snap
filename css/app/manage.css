@@ -52,6 +52,7 @@
 }
 
 .manage-unlink > p,
+.manage-delete > p,
 .respond-unlink > p {
   margin: 0;
   color: var(--text-color-light);
@@ -62,5 +63,11 @@
   margin-top: var(--space-xl);
   display: flex;
   flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.respond-device-actions {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
 }
