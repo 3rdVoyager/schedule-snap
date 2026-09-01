@@ -23,22 +23,22 @@
 </head>
 <body>
   <header></header>
-  <main>
-    <p id="respond-status" hidden></p>
-    <article id="event-view" hidden>
-      <h1 id="event-title"></h1>
-      <p id="event-description"></p>
-      <p id="event-meta"></p>
-      <ul id="event-windows"></ul>
+  <main class="dashboard-main">
+    <article id="event-view" class="page-header card card-hero" hidden>
+      <h1 class="text-title" id="event-title"></h1>
+      <p class="text-body text-muted" id="event-description" hidden></p>
+      <p class="text-sub" id="event-meta"></p>
+      <ul class="page-header-windows" id="event-windows"></ul>
     </article>
 
-    <form id="response-form" hidden>
-      <fieldset>
-        <legend>Your details</legend>
+    <form id="response-form" class="card-stack" hidden>
+      <fieldset class="card card-normal section">
+        <legend class="text-heading">Your details</legend>
         <div class="form-field">
-          <label for="display-name-input">Display name</label>
+          <label class="text-body-sm text-semibold" for="display-name-input">Display name</label>
           <input
             id="display-name-input"
+            class="text-input"
             name="displayName"
             placeholder="Display name"
             required
@@ -46,9 +46,9 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend>When are you available?</legend>
-        <p>Select days and drag to mark your available times.</p>
+      <fieldset class="card card-normal section">
+        <legend class="text-heading">When are you available?</legend>
+        <p class="text-sub">Select days and drag to mark your available times.</p>
         <div id="availability-calendar"></div>
       </fieldset>
 
@@ -61,13 +61,13 @@
       </button>
     </form>
 
-    <div id="respond-success" hidden>
-      <h2>Thanks, your response was submitted.</h2>
-      <p>Save this link to edit your response later.</p>
+    <div id="respond-success" class="card card-normal section" hidden>
+      <h2 class="text-heading">Thanks, your response was submitted.</h2>
+      <p class="text-sub">Save this link to edit your response later.</p>
       <section id="edit-link-section">
-        <p>Edit token: <strong id="edit-token"></strong></p>
-        <label for="edit-link">Edit link</label>
-        <input type="text" id="edit-link" readonly />
+        <p class="text-sub">Edit token: <strong id="edit-token"></strong></p>
+        <label class="text-body-sm text-semibold" for="edit-link">Edit link</label>
+        <input type="text" class="text-input" id="edit-link" readonly />
         <button
           type="button"
           class="button button-secondary-outline"
@@ -83,8 +83,8 @@
       </p>
     </div>
 
-    <section id="unlink-section" class="respond-unlink" hidden>
-      <p>
+    <section id="unlink-section" class="card card-normal section respond-unlink" hidden>
+      <p class="text-sub">
         Remove this response from your dashboard on this device, or delete it
         permanently from the server.
       </p>

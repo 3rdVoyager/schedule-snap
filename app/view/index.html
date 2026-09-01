@@ -22,26 +22,28 @@
   <body>
     <header></header>
     <main class="dashboard-main view-page">
-      <p id="view-status" class="manage-status" hidden></p>
       <article id="view-article" class="view-page" hidden>
-        <header class="dashboard-page-header">
-          <div>
-            <h1 id="event-title"></h1>
-            <p class="dashboard-lead">Recommended times and who responded.</p>
+        <header class="card card-hero card-header">
+          <div class="page-header" id="page-header">
+            <h1 class="text-title" id="event-title"></h1>
+            <p class="text-body text-muted" id="event-description" hidden></p>
+            <p class="text-sub" id="event-meta"></p>
+            <ul class="page-header-windows" id="event-windows"></ul>
+            <p class="text-body text-muted" id="page-lead">Recommended times and who responded.</p>
           </div>
         </header>
 
-        <section class="dashboard-section">
-          <h2>Recommendations</h2>
-          <p id="recommendations-empty" class="dashboard-empty-state" hidden>
+        <section class="card card-normal section">
+          <h2 class="text-heading">Recommendations</h2>
+          <p id="recommendations-empty" class="empty-state text-sub text-center" hidden>
             No overlapping times yet. Add more responses to see recommendations.
           </p>
           <ul id="recommendations-list" class="dashboard-list view-list"></ul>
         </section>
 
-        <section class="dashboard-section">
-          <h2>Responses</h2>
-          <p id="responses-empty" class="dashboard-empty-state" hidden>
+        <section class="card card-normal section">
+          <h2 class="text-heading">Responses</h2>
+          <p id="responses-empty" class="empty-state text-sub text-center" hidden>
             No responses yet.
           </p>
           <ul id="responses-list" class="dashboard-list view-list"></ul>

@@ -8,9 +8,10 @@ import {
   resolveManageToken,
   setActiveOrganizerEventId,
 } from "./session.js";
+import { populatePageHeader } from "./page-header.js";
+import { showToast } from "./toast.js";
 import { utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
 
-const statusEl = document.querySelector("#manage-status");
 const view = document.querySelector("#manage-view");
 const form = document.querySelector("#manage-event-form");
 
@@ -40,6 +41,7 @@ document
 document.querySelector("#copy-respond-link").addEventListener("click", async () => {
   const input = document.querySelector("#respond-link");
   await navigator.clipboard.writeText(input.value);
+  showToast("Participant link copied");
 });
 
 document
@@ -47,6 +49,7 @@ document
   .addEventListener("click", async () => {
     const input = document.querySelector("#organizer-link");
     await navigator.clipboard.writeText(input.value);
+    showToast("Organizer link copied");
   });
 
 document.querySelector("#unlink-event").addEventListener("click", () => {
@@ -68,9 +71,6 @@ document.querySelector("#delete-event").addEventListener("click", async () => {
     return;
   }
 
-  statusEl.hidden = false;
-  statusEl.textContent = "Deleting…";
-
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
       method: "DELETE",
@@ -78,7 +78,7 @@ document.querySelector("#delete-event").addEventListener("click", async () => {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not delete event";
+      showToast(data.error ?? "Could not delete event", { type: "error" });
       return;
     }
 
@@ -88,14 +88,12 @@ document.querySelector("#delete-event").addEventListener("click", async () => {
     }
     window.location.href = "/app/";
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 });
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  statusEl.hidden = false;
-  statusEl.textContent = "Saving…";
 
   const timezone = document.querySelector("#timezone").value;
   const schedulingWindows = [
@@ -134,25 +132,21 @@ form.addEventListener("submit", async (event) => {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not save changes";
+      showToast(data.error ?? "Could not save changes", { type: "error" });
       return;
     }
 
     updateOrganizerEventTitle(data.id, data.title);
+    populatePageHeader(document.querySelector("#page-header"), data);
     populateForm(data);
     renderResponses(data);
-    statusEl.textContent = "Changes saved";
-    setTimeout(() => {
-      statusEl.hidden = true;
-    }, 2000);
+    showToast("Changes saved");
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 });
 
 async function loadManage(manageToken) {
-  statusEl.hidden = false;
-  statusEl.textContent = "Loading…";
   view.hidden = true;
 
   try {
@@ -161,7 +155,7 @@ async function loadManage(manageToken) {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not load event";
+      showToast(data.error ?? "Could not load event", { type: "error" });
       return;
     }
 
@@ -169,15 +163,14 @@ async function loadManage(manageToken) {
     currentEventId = data.id;
     setActiveOrganizerEventId(entry.id);
 
-    statusEl.hidden = true;
     renderManage(data, manageToken);
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 }
 
 function renderManage(data, manageToken) {
-  document.querySelector("#page-title").textContent = data.title;
+  populatePageHeader(document.querySelector("#page-header"), data);
   document.querySelector("#page-lead").textContent =
     `Event code ${data.eventCode} · update settings and share links.`;
   document.querySelector("#event-code").textContent = data.eventCode;
@@ -231,7 +224,6 @@ function populateForm(data) {
 }
 
 function renderResponses(data) {
-  document.querySelector("#page-title").textContent = data.title;
   document.querySelector("#response-count").textContent =
     `${data.responses.length} response(s)`;
 
@@ -249,7 +241,7 @@ function renderResponses(data) {
   list.hidden = false;
   for (const r of data.responses) {
     const li = document.createElement("li");
-    li.className = "dashboard-list-item";
+    li.className = "dashboard-list-item text-body-sm text-medium";
     li.textContent = r.displayName;
     list.appendChild(li);
   }

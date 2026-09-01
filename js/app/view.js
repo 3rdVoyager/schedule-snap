@@ -9,9 +9,10 @@ import {
   setActiveOrganizerEventId,
   setParticipantEventCode,
 } from "./session.js";
+import { populatePageHeader } from "./page-header.js";
+import { showToast } from "./toast.js";
 import { formatInZone } from "./time.js";
 
-const statusEl = document.querySelector("#view-status");
 const article = document.querySelector("#view-article");
 
 const deepLink = parseDeepLink();
@@ -30,8 +31,6 @@ if (manageToken.length === 32) {
 }
 
 async function loadParticipantView(eventCode) {
-  statusEl.hidden = false;
-  statusEl.textContent = "Loading…";
   article.hidden = true;
 
   try {
@@ -40,19 +39,16 @@ async function loadParticipantView(eventCode) {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not load results";
+      showToast(data.error ?? "Could not load results", { type: "error" });
       return;
     }
-    statusEl.hidden = true;
     renderView(data);
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 }
 
 async function loadOrganizerView(token) {
-  statusEl.hidden = false;
-  statusEl.textContent = "Loading…";
   article.hidden = true;
 
   try {
@@ -61,7 +57,7 @@ async function loadOrganizerView(token) {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not load results";
+      showToast(data.error ?? "Could not load results", { type: "error" });
       return;
     }
 
@@ -74,17 +70,16 @@ async function loadOrganizerView(token) {
       setActiveOrganizerEventId(entry.id);
     }
 
-    statusEl.hidden = true;
     renderView(data);
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 }
 
 function renderView(data) {
   const timezone = data.settings?.timezone ?? "UTC";
 
-  document.querySelector("#event-title").textContent = data.title;
+  populatePageHeader(document.querySelector("#page-header"), data);
 
   const recList = document.querySelector("#recommendations-list");
   const recEmpty = document.querySelector("#recommendations-empty");
@@ -101,11 +96,11 @@ function renderView(data) {
       li.className = "dashboard-list-item";
 
       const time = document.createElement("span");
-      time.className = "view-list-time";
+      time.className = "text-body-sm text-medium";
       time.textContent = `${formatInZone(rec.start, timezone)} – ${formatInZone(rec.end, timezone)}`;
 
       const meta = document.createElement("span");
-      meta.className = "view-list-meta";
+      meta.className = "text-sub";
       meta.textContent = `${rec.availableCount} of ${rec.totalResponses} available`;
 
       li.append(time, meta);
@@ -125,7 +120,7 @@ function renderView(data) {
     resList.hidden = false;
     for (const r of data.responses) {
       const li = document.createElement("li");
-      li.className = "dashboard-list-item";
+      li.className = "dashboard-list-item text-body-sm text-medium";
       li.textContent = r.displayName;
       resList.appendChild(li);
     }

@@ -4,7 +4,7 @@ header.innerHTML = `
     <nav>
         <a href="/app/" class="brand-container">
             <img class="brand-logo" src="/assets/logos/logo.png" alt="ScheduleSnap">
-            <div class="brand-text"><span class="brand-text-primary">Schedule</span><span class="brand-text-secondary">Snap</span></div>
+            <div class="text-brand"><span class="text-primary">Schedule</span><span class="text-accent">Snap</span></div>
         </a>
         <ul>
             <li><a href="/app/" class="button button-primary-outline">Dashboard</a></li>

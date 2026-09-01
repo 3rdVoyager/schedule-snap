@@ -1,14 +1,18 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--font-family);
-}
-
-body {
-    font-family: var(--font-family);
-}
-
-a {
-    text-decoration: none;
-}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--text-size-medium);
+    font-weight: 400;
+    line-height: var(--line-height-normal);
+    color: var(--text-color-dark);
+}
+
+a {
+    text-decoration: none;
+}

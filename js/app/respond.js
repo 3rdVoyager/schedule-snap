@@ -1,7 +1,8 @@
 import { API_URL } from "./config.js";
 import { bearerAuth, jsonHeaders } from "./api-auth.js";
 import { createCalendar } from "./calendar.js";
-import { formatInZone } from "./time.js";
+import { populatePageHeader } from "./page-header.js";
+import { showToast } from "./toast.js";
 import { addMyResponse, removeMyResponse, updateResponseMeta } from "./storage.js";
 import {
   parseDeepLink,
@@ -10,7 +11,6 @@ import {
   setParticipantEventCode,
 } from "./session.js";
 
-const statusEl = document.querySelector("#respond-status");
 const view = document.querySelector("#event-view");
 const responseForm = document.querySelector("#response-form");
 const successEl = document.querySelector("#respond-success");
@@ -47,9 +47,6 @@ responseForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!currentEvent || !availabilityCalendar) return;
 
-  statusEl.hidden = true;
-  statusEl.textContent = "";
-
   const displayName = document
     .querySelector("#display-name-input")
     .value.trim();
@@ -57,8 +54,7 @@ responseForm.addEventListener("submit", async (e) => {
 
   if (!displayName) return;
   if (availability.length === 0) {
-    statusEl.hidden = false;
-    statusEl.textContent = "Add at least one availability window.";
+    showToast("Add at least one availability window.", { type: "error" });
     return;
   }
 
@@ -75,8 +71,7 @@ responseForm.addEventListener("submit", async (e) => {
       await submitCreate(payload, displayName);
     }
   } catch {
-    statusEl.hidden = false;
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 });
 
@@ -98,8 +93,7 @@ async function submitCreate(payload, displayName) {
   const data = await response.json();
 
   if (!response.ok) {
-    statusEl.hidden = false;
-    statusEl.textContent = data.error ?? "Could not submit response";
+    showToast(data.error ?? "Could not submit response", { type: "error" });
     return;
   }
 
@@ -134,8 +128,7 @@ async function submitEdit(payload, displayName) {
   const data = await response.json();
 
   if (!response.ok) {
-    statusEl.hidden = false;
-    statusEl.textContent = data.error ?? "Could not update response";
+    showToast(data.error ?? "Could not update response", { type: "error" });
     return;
   }
 
@@ -146,11 +139,10 @@ async function submitEdit(payload, displayName) {
     "Your response was updated.";
   successEl.hidden = false;
   document.querySelector("#edit-link-section").hidden = true;
+  showToast("Response updated");
 }
 
 async function loadForEdit(token) {
-  statusEl.hidden = false;
-  statusEl.textContent = "Loading…";
   view.hidden = true;
   responseForm.hidden = true;
 
@@ -160,7 +152,7 @@ async function loadForEdit(token) {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not load response";
+      showToast(data.error ?? "Could not load response", { type: "error" });
       return;
     }
 
@@ -173,15 +165,13 @@ async function loadForEdit(token) {
     currentResponseId = data.response.id;
     editToken = token;
 
-    statusEl.hidden = true;
     renderEvent(currentEvent);
 
     showUnlinkSection();
 
     if (data.settings.allowResponseEdits === false) {
       responseForm.hidden = true;
-      statusEl.hidden = false;
-      statusEl.textContent = "Edits are not allowed for this event.";
+      showToast("Edits are not allowed for this event.", { type: "error" });
       return;
     }
 
@@ -193,13 +183,11 @@ async function loadForEdit(token) {
     document.querySelector("#submit-response-btn").textContent =
       "Update response";
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 }
 
 async function loadEvent(eventCode) {
-  statusEl.hidden = false;
-  statusEl.textContent = "Loading…";
   view.hidden = true;
   responseForm.hidden = true;
 
@@ -209,46 +197,29 @@ async function loadEvent(eventCode) {
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not load event";
+      showToast(data.error ?? "Could not load event", { type: "error" });
       return;
     }
     currentEvent = data;
     currentEventCode = eventCode;
     setParticipantEventCode(eventCode);
-    statusEl.hidden = true;
     renderEvent(data);
     initCalendar(currentEvent);
     responseForm.hidden = false;
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 }
 
 function renderEvent(data) {
-  document.querySelector("#event-title").textContent = data.title;
-
-  const desc = document.querySelector("#event-description");
-  desc.textContent = data.description ?? "";
-  desc.hidden = !data.description;
-
-  const tz = data.settings.timezone;
-  const mins = data.settings.durationMinutes;
-  document.querySelector("#event-meta").textContent = `${mins} minutes · ${tz}`;
-
-  const list = document.querySelector("#event-windows");
-  list.replaceChildren();
-  for (const w of data.settings.schedulingWindows) {
-    const li = document.createElement("li");
-    li.textContent = `${formatInZone(w.start, tz)} – ${formatInZone(w.end, tz)}`;
-    list.appendChild(li);
-  }
-
+  populatePageHeader(view, data);
   view.hidden = false;
 }
 
 document.querySelector("#copy-edit-link")?.addEventListener("click", async () => {
   const input = document.querySelector("#edit-link");
   await navigator.clipboard.writeText(input.value);
+  showToast("Edit link copied");
 });
 
 document.querySelector("#unlink-response").addEventListener("click", () => {
@@ -267,9 +238,6 @@ document.querySelector("#delete-response").addEventListener("click", async () =>
     return;
   }
 
-  statusEl.hidden = false;
-  statusEl.textContent = "Deleting…";
-
   try {
     const response = await fetch(`${API_URL}/api/events/respond`, {
       method: "DELETE",
@@ -277,7 +245,7 @@ document.querySelector("#delete-response").addEventListener("click", async () =>
     });
     const data = await response.json();
     if (!response.ok) {
-      statusEl.textContent = data.error ?? "Could not delete response";
+      showToast(data.error ?? "Could not delete response", { type: "error" });
       return;
     }
 
@@ -286,7 +254,7 @@ document.querySelector("#delete-response").addEventListener("click", async () =>
     }
     window.location.href = "/app/";
   } catch {
-    statusEl.textContent = "Could not reach the server";
+    showToast("Could not reach the server", { type: "error" });
   }
 });
 

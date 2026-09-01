@@ -2,6 +2,7 @@ import { API_URL } from "./config.js";
 import { zonedToUtcIso } from "./time.js";
 import { addMyResponse } from "./storage.js";
 import { registerOrganizerEvent } from "./session.js";
+import { showToast } from "./toast.js";
 
 const createEventForm = document.querySelector("#create-event-form");
 
@@ -16,14 +17,15 @@ document
     document.querySelector("#scheduling-windows").appendChild(clone);
   });
 
-function copyInputValue(inputId, buttonId) {
+function copyInputValue(inputId, buttonId, label) {
   document.querySelector(buttonId).addEventListener("click", async () => {
     const input = document.querySelector(inputId);
     await navigator.clipboard.writeText(input.value);
+    showToast(`${label} copied`);
   });
 }
-copyInputValue("#respond-link", "#copy-respond-link");
-copyInputValue("#organizer-link", "#copy-organizer-link");
+copyInputValue("#respond-link", "#copy-respond-link", "Participant link");
+copyInputValue("#organizer-link", "#copy-organizer-link", "Organizer link");
 
 createEventForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -67,7 +69,7 @@ createEventForm.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Create event failed:", data.error);
+      showToast(data.error ?? "Could not create event", { type: "error" });
       return;
     }
 
@@ -84,7 +86,7 @@ createEventForm.addEventListener("submit", async (event) => {
     document.querySelector("#respond-link").value = respondUrl;
     document.querySelector("#organizer-link").value = manageUrl;
     success.hidden = false;
-  } catch (error) {
-    console.error("Create event failed:", error);
+  } catch {
+    showToast("Could not reach the server", { type: "error" });
   }
 });

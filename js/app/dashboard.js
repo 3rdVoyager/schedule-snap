@@ -13,8 +13,8 @@ import {
   setActiveOrganizerEventId,
   setParticipantEventCode,
 } from "./session.js";
+import { showToast } from "./toast.js";
 
-const statusEl = document.querySelector("#dashboard-status");
 const joinForm = document.querySelector("#join-form");
 const addOrganizerForm = document.querySelector("#add-organizer-form");
 const organizerList = document.querySelector("#organizer-events-list");
@@ -63,18 +63,10 @@ addOrganizerForm.addEventListener("submit", async (e) => {
 });
 
 function showStatus(message) {
-  statusEl.hidden = false;
-  statusEl.textContent = message;
-}
-
-function hideStatus() {
-  statusEl.hidden = true;
-  statusEl.textContent = "";
+  showToast(message, { type: "error" });
 }
 
 async function validateAndJoin(eventCode, nextPath) {
-  hideStatus();
-  showStatus("Checking event code…");
   try {
     const response = await fetch(`${API_URL}/api/events/respond`, {
       headers: bearerAuth("event", eventCode),
@@ -92,8 +84,6 @@ async function validateAndJoin(eventCode, nextPath) {
 }
 
 async function handleOrganizerToken(manageToken, nextPath) {
-  hideStatus();
-  showStatus("Verifying organizer secret…");
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
       headers: bearerAuth("manage", manageToken),
@@ -125,7 +115,6 @@ function appendToken(path, manageToken) {
 }
 
 function renderLists() {
-  hideStatus();
   renderOrganizerEvents();
   renderMyResponses();
 }
@@ -141,7 +130,7 @@ function renderOrganizerEvents() {
     li.className = "dashboard-list-item";
 
     const title = document.createElement("span");
-    title.className = "dashboard-list-title";
+    title.className = "text-body-sm text-medium";
     title.textContent = event.title;
     li.appendChild(title);
 
@@ -150,7 +139,7 @@ function renderOrganizerEvents() {
 
     const manageBtn = document.createElement("a");
     manageBtn.href = appendToken("/app/manage/", event.manageToken);
-    manageBtn.className = "button button-primary-outline";
+    manageBtn.className = "button button-small button-primary-outline";
     manageBtn.textContent = "Manage";
     manageBtn.addEventListener("click", () => {
       setActiveOrganizerEventId(event.id);
@@ -159,7 +148,7 @@ function renderOrganizerEvents() {
 
     const viewBtn = document.createElement("a");
     viewBtn.href = appendToken("/app/view/", event.manageToken);
-    viewBtn.className = "button button-primary-outline";
+    viewBtn.className = "button button-small button-primary-outline";
     viewBtn.textContent = "View";
     viewBtn.addEventListener("click", () => {
       setActiveOrganizerEventId(event.id);
@@ -201,7 +190,7 @@ function renderMyResponses() {
     li.className = "dashboard-list-item";
 
     const label = document.createElement("span");
-    label.className = "dashboard-list-title";
+    label.className = "text-body-sm text-medium";
     label.textContent = `${entry.eventTitle} — ${entry.displayName}`;
     li.appendChild(label);
 
@@ -210,14 +199,14 @@ function renderMyResponses() {
 
     const editBtn = document.createElement("a");
     editBtn.href = `/app/respond/#edit=${entry.editToken}`;
-    editBtn.className = "button button-primary-outline";
+    editBtn.className = "button button-small button-primary-outline";
     editBtn.textContent = "Edit";
     actions.appendChild(editBtn);
 
     if (entry.resultsVisibleToParticipants) {
       const viewBtn = document.createElement("a");
       viewBtn.href = `/app/view/?code=${entry.eventCode}`;
-      viewBtn.className = "button button-primary-outline";
+      viewBtn.className = "button button-small button-primary-outline";
       viewBtn.textContent = "View results";
       actions.appendChild(viewBtn);
     }

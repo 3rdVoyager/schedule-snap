@@ -224,7 +224,7 @@ export function createCalendar(container, options) {
     });
 
     const title = document.createElement("h3");
-    title.className = "calendar-title";
+    title.className = "text-body-sm text-semibold";
     const midKey = dayKey(viewYear, viewMonth, 15);
     const midSample = rangeFromDayMinutes(midKey, 12 * 60, 12 * 60 + 1, timezone);
     title.textContent = new Intl.DateTimeFormat(undefined, {
@@ -287,7 +287,9 @@ export function createCalendar(container, options) {
         btn.disabled = true;
       } else {
         btn.classList.add("calendar-day--in-window");
-        if (key === selectedDay) btn.classList.add("calendar-day--selected");
+        if (key === selectedDay) {
+          btn.classList.add("calendar-day--selected", "text-bold");
+        }
         if (rangesOnDay(key).length > 0) {
           btn.classList.add("calendar-day--has-ranges");
         }
@@ -308,7 +310,8 @@ export function createCalendar(container, options) {
       layout.appendChild(buildTimePanel());
     } else {
       const placeholder = document.createElement("div");
-      placeholder.className = "calendar-time-panel calendar-time-panel--empty";
+      placeholder.className =
+        "calendar-time-panel calendar-time-panel--empty text-sub text-center";
       placeholder.textContent = "Select a highlighted day to set your availability.";
       layout.appendChild(placeholder);
     }
@@ -386,13 +389,13 @@ export function createCalendar(container, options) {
     panel.className = "calendar-time-panel";
 
     const label = document.createElement("p");
-    label.className = "calendar-time-label";
+    label.className = "text-body-sm text-semibold";
     const sample = rangeFromDayMinutes(selectedDay, 12 * 60, 12 * 60 + 1, timezone);
     label.textContent = formatInZone(sample.start, timezone).split(",")[0];
     panel.appendChild(label);
 
     const hint = document.createElement("p");
-    hint.className = "calendar-time-hint";
+    hint.className = "text-sub";
     hint.textContent = "Drag empty slots to add time. Click a block to remove it.";
     panel.appendChild(hint);
 
@@ -463,7 +466,7 @@ export function createCalendar(container, options) {
 
     for (const range of dayRanges) {
       const li = document.createElement("li");
-      li.className = "calendar-range-item";
+      li.className = "calendar-range-item text-sub";
 
       const text = document.createElement("span");
       text.textContent = `${formatInZone(range.start, timezone)} – ${formatInZone(range.end, timezone)}`;

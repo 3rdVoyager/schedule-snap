@@ -23,8 +23,6 @@ nav ul li {
 
 nav ul li a {
     text-decoration: none;
-    color: var(--primary-color);
-    font-weight: 500;
 }
 
 nav ul li a:hover {
@@ -58,7 +56,6 @@ footer {
 
 .footer-description {
     margin-top: 20px;
-    color: var(--text-color-light);
     margin-bottom: 20px;
 }
 
@@ -74,9 +71,6 @@ footer {
 }
 
 .footer-column h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--primary-color);
     margin-bottom: 20px;
 }
 
@@ -89,7 +83,6 @@ footer {
 
 .footer-column ul li a {
     text-decoration: none;
-    color: var(--text-color-light);
 }
 
 .footer-column ul li a:hover {
@@ -98,9 +91,6 @@ footer {
 
 .footer-copyright {
     padding-top: 20px;
-    font-size: var(--text-size-small);
-    color: var(--text-color-light);
-    text-align: center;
     margin-top: 20px;
     border-top: 1px solid var(--border-color);
 }

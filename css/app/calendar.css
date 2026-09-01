@@ -24,11 +24,8 @@
   margin-bottom: var(--space-sm);
 }
 
-.calendar-title {
+.calendar-header .text-body-sm {
   margin: 0;
-  font-size: var(--text-size-small);
-  font-weight: 600;
-  color: var(--text-color-dark);
 }
 
 .calendar-nav {
@@ -41,7 +38,6 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--button-border-radius);
   background: var(--surface-card);
-  color: var(--text-color-dark);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
@@ -57,10 +53,10 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
   margin-bottom: 2px;
-  text-align: center;
-  font-size: 11px;
+  font-size: var(--text-size-xs);
   font-weight: 600;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .calendar-grid {
@@ -78,9 +74,8 @@
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
-  font-size: 12px;
+  font-size: var(--text-size-caption);
   font-weight: 500;
-  color: var(--text-color-dark);
   cursor: pointer;
   padding: 0;
 }
@@ -91,7 +86,6 @@
 }
 
 .calendar-day--disabled {
-  color: var(--text-muted);
   opacity: 0.4;
   cursor: default;
 }
@@ -103,7 +97,6 @@
 
 .calendar-day--selected {
   border-color: var(--primary-color);
-  font-weight: 700;
 }
 
 .calendar-day--has-ranges::after {
@@ -131,22 +124,11 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  font-size: var(--text-size-small);
-  color: var(--text-color-light);
-  text-align: center;
 }
 
-.calendar-time-label {
+.calendar-time-panel > .text-body-sm,
+.calendar-time-panel > .text-sub {
   margin: 0;
-  font-size: var(--text-size-small);
-  font-weight: 600;
-  color: var(--text-color-dark);
-}
-
-.calendar-time-hint {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-color-light);
 }
 
 .calendar-time-grid {
@@ -186,14 +168,13 @@
 
 .calendar-time-slot-label {
   padding: 0 var(--space-xs);
-  font-size: 11px;
-  line-height: 1;
   white-space: nowrap;
-  color: var(--text-muted);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   overflow: hidden;
+  font-size: var(--text-size-xs);
+  color: var(--text-muted);
 }
 
 .calendar-time-slot-track {
@@ -246,8 +227,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-sm);
-  font-size: 12px;
-  color: var(--text-color-dark);
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
@@ -262,9 +241,9 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: var(--text-muted);
   font-size: 1.1rem;
   line-height: 1;
+  color: var(--text-muted);
   cursor: pointer;
 }
 

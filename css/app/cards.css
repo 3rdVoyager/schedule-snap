@@ -1,0 +1,113 @@
+/* Card variants: hero (yellow), bold (teal), normal (gray/white) */
+
+.card {
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+}
+
+.card-hero {
+  background-color: var(--secondary-color-light);
+  border: 2px solid var(--secondary-color);
+}
+
+.card-bold {
+  background: var(--primary-color-light);
+  border: 2px solid var(--primary-color);
+}
+
+.card-normal {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.card-hero.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.card-hero.card-header h1 {
+  margin: 0 0 var(--space-sm);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.section h2 {
+  margin: 0;
+}
+
+.section > .text-sub,
+.dashboard-lead {
+  margin: 0;
+}
+
+.card-bold .card-normal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+
+.card-normal > .dashboard-list,
+.card-normal > .view-list {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--button-border-radius);
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+.empty-state,
+.dashboard-empty-state {
+  padding: var(--space-lg);
+  border-radius: var(--button-border-radius);
+  background: var(--surface-page);
+}
+
+.empty-state p,
+.dashboard-empty-state p {
+  margin: 0;
+}
+
+.empty-state p + p,
+.dashboard-empty-state p + p {
+  margin-top: var(--space-sm);
+}
+
+.empty-state a.button,
+.dashboard-empty-state a.button {
+  margin-top: var(--space-sm);
+}
+
+@media (max-width: 640px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-hero.card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-hero.card-header .button {
+    align-self: flex-start;
+  }
+}

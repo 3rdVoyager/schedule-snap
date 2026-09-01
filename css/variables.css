@@ -14,6 +14,19 @@
     --tertiary-color-hover: #afafaf;
 
     --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-family-mono: ui-monospace, "Cascadia Code", "Consolas", monospace;
+
+    --text-size-xs: 11px;
+    --text-size-caption: 12px;
+    --text-size-small: 14px;
+    --text-size-medium: 16px;
+    --text-size-large: 18px;
+    --text-size-display: 1.75rem;
+    --text-size-brand: 1.5rem;
+
+    --line-height-tight: 1.2;
+    --line-height-snug: 1.25;
+    --line-height-normal: 1.5;
 
     /* Site */
     --site-bg-color: #FAFAFA;
@@ -23,9 +36,6 @@
 
     --text-color-dark: #000000;
     --text-color-light: #595959;
-    --text-size-small: 14px;
-    --text-size-medium: 16px;
-    --text-size-large: 18px;
 
     --button-border-radius: 10px;
     --button-text-color: #FFFFFF;

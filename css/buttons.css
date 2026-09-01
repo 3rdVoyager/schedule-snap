@@ -3,12 +3,28 @@
     text-decoration: none;
     border: 2px solid transparent;
     cursor: pointer;
-    font-weight: 600;
-    font-size: var(--text-size-medium);
     color: var(--button-text-color);
     padding: 10px 20px;
     border-radius: var(--button-border-radius);
+    font-size: var(--text-size-medium);
+    font-weight: 600;
+    line-height: var(--line-height-snug);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+a.button,
+button.button {
+    font-family: inherit;
+}
+
+button.button {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.button-small {
+    padding: 6px 14px;
+    font-size: var(--text-size-small);
 }
 
 .button-primary {
@@ -35,13 +51,11 @@
 .button-secondary {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
-    color: var(--text-on-accent);
 }
 
 .button-secondary:hover {
     background-color: var(--secondary-color-hover);
     border-color: var(--secondary-color-hover);
-    color: var(--text-on-accent);
 }
 
 .button-secondary-outline {

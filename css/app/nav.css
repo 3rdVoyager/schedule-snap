@@ -4,6 +4,12 @@ header {
     padding: var(--nav-padding);
 }
 
+body > header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 nav {
     display: flex;
     flex-direction: row;

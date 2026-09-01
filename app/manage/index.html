@@ -32,26 +32,29 @@
   <body>
     <header></header>
     <main class="dashboard-main">
-      <p id="manage-status" class="manage-status" hidden></p>
       <article id="manage-view" class="manage-page" hidden>
-        <header class="dashboard-page-header">
-          <div>
-            <h1 id="page-title">Manage event</h1>
-            <p class="dashboard-lead" id="page-lead">
+        <header class="card card-hero card-header">
+          <div class="page-header" id="page-header">
+            <h1 class="text-title" id="event-title"></h1>
+            <p class="text-body text-muted" id="event-description" hidden></p>
+            <p class="text-sub" id="event-meta"></p>
+            <ul class="page-header-windows" id="event-windows"></ul>
+            <p class="text-body text-muted" id="page-lead">
               Update settings and share links for this event.
             </p>
           </div>
         </header>
 
-        <div class="dashboard-entry-panel">
-          <div class="dashboard-entry-grid">
-            <section class="dashboard-section">
-              <h2>Share with participants</h2>
-              <p>Event code: <strong id="event-code"></strong></p>
-              <div class="dashboard-card">
-                <label for="respond-link">Participant link</label>
+        <div class="card card-bold">
+          <div class="card-grid">
+            <section class="section">
+              <h2 class="text-heading">Share with participants</h2>
+              <p class="text-sub">Event code: <strong id="event-code" class="text-code"></strong></p>
+              <div class="card card-normal">
+                <label class="text-body-sm text-semibold" for="respond-link">Participant link</label>
                 <input
                   type="text"
+                  class="text-input"
                   id="respond-link"
                   readonly
                   spellcheck="false"
@@ -66,13 +69,14 @@
               </div>
             </section>
 
-            <section class="dashboard-section">
-              <h2>Your organizer access</h2>
-              <p>Anyone with this link can manage the event and view responses.</p>
-              <div class="dashboard-card">
-                <label for="organizer-link">Organizer link</label>
+            <section class="section">
+              <h2 class="text-heading">Your organizer access</h2>
+              <p class="text-sub">Anyone with this link can manage the event and view responses.</p>
+              <div class="card card-normal">
+                <label class="text-body-sm text-semibold" for="organizer-link">Organizer link</label>
                 <input
                   type="text"
+                  class="text-input"
                   id="organizer-link"
                   readonly
                   spellcheck="false"
@@ -89,23 +93,23 @@
           </div>
         </div>
 
-        <form id="manage-event-form">
-          <fieldset>
-            <legend>Event details</legend>
+        <form id="manage-event-form" class="card-stack">
+          <fieldset class="card card-normal section">
+            <legend class="text-heading">Event details</legend>
             <div class="form-field">
-              <label for="title">Title</label>
-              <input type="text" id="title" name="title" required />
+              <label class="text-body-sm text-semibold" for="title">Title</label>
+              <input type="text" class="text-input" id="title" name="title" required />
             </div>
             <div class="form-field">
-              <label for="description">Description</label>
-              <textarea id="description" name="description"></textarea>
+              <label class="text-body-sm text-semibold" for="description">Description</label>
+              <textarea class="text-input" id="description" name="description"></textarea>
             </div>
           </fieldset>
-          <fieldset>
-            <legend>How long is the event?</legend>
+          <fieldset class="card card-normal section">
+            <legend class="text-heading">How long is the event?</legend>
             <div class="form-field">
-              <label for="duration">Duration</label>
-              <select id="duration" name="duration">
+              <label class="text-body-sm text-semibold" for="duration">Duration</label>
+              <select class="text-input" id="duration" name="duration">
                 <option value="30">30 minutes</option>
                 <option value="45">45 minutes</option>
                 <option value="60">1 hour</option>
@@ -116,11 +120,11 @@
               </select>
             </div>
           </fieldset>
-          <fieldset>
-            <legend>What timezone is the event in?</legend>
+          <fieldset class="card card-normal section">
+            <legend class="text-heading">What timezone is the event in?</legend>
             <div class="form-field">
-              <label for="timezone">Timezone</label>
-              <select id="timezone" name="timezone">
+              <label class="text-body-sm text-semibold" for="timezone">Timezone</label>
+              <select class="text-input" id="timezone" name="timezone">
                 <option value="Pacific/Pago_Pago">UTC-11 — Samoa</option>
                 <option value="Pacific/Honolulu">UTC-10 — Hawaii</option>
                 <option value="America/Anchorage">UTC-9 — Alaska</option>
@@ -151,18 +155,18 @@
               </select>
             </div>
           </fieldset>
-          <fieldset>
-            <legend>When can participants schedule their availability?</legend>
+          <fieldset class="card card-normal section">
+            <legend class="text-heading">When can participants schedule their availability?</legend>
             <div id="scheduling-windows">
               <div class="scheduling-window-row">
                 <input
                   type="datetime-local"
-                  class="scheduling-window-start"
+                  class="text-input scheduling-window-start"
                   aria-label="Scheduling window start"
                 />
                 <input
                   type="datetime-local"
-                  class="scheduling-window-end"
+                  class="text-input scheduling-window-end"
                   aria-label="Scheduling window end"
                 />
               </div>
@@ -175,16 +179,16 @@
               + Add scheduling window
             </button>
           </fieldset>
-          <fieldset>
-            <legend>Participant options</legend>
+          <fieldset class="card card-normal section">
+            <legend class="text-heading">Participant options</legend>
             <div class="form-field form-field-checkbox">
-              <label>
+              <label class="text-body-sm text-semibold">
                 <input type="checkbox" id="allow-response-edits" />
                 Allow participants to edit their responses
               </label>
             </div>
             <div class="form-field form-field-checkbox">
-              <label>
+              <label class="text-body-sm text-semibold">
                 <input type="checkbox" id="results-visible" />
                 Show results to participants
               </label>
@@ -195,18 +199,18 @@
           </button>
         </form>
 
-        <section class="dashboard-section manage-responses">
-          <h2>Responses</h2>
-          <p id="response-count"></p>
-          <p id="responses-empty" class="dashboard-empty-state" hidden>
+        <section class="card card-normal section manage-responses">
+          <h2 class="text-heading">Responses</h2>
+          <p class="text-sub" id="response-count"></p>
+          <p id="responses-empty" class="empty-state text-sub text-center" hidden>
             No responses yet. Share the participant link above.
           </p>
           <ul id="responses-list" class="dashboard-list"></ul>
         </section>
 
-        <section class="dashboard-section manage-delete">
-          <h2>Delete event</h2>
-          <p>
+        <section class="card card-normal section manage-delete">
+          <h2 class="text-heading">Delete event</h2>
+          <p class="text-sub">
             Permanently delete this event and all responses. This cannot be
             undone.
           </p>
@@ -219,9 +223,9 @@
           </button>
         </section>
 
-        <section class="dashboard-section manage-unlink">
-          <h2>This device</h2>
-          <p>
+        <section class="card card-normal section manage-unlink">
+          <h2 class="text-heading">This device</h2>
+          <p class="text-sub">
             Remove this event from your dashboard on this device. The event and
             responses remain on the server.
           </p>
