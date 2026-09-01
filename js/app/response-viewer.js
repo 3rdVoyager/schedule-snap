@@ -20,8 +20,8 @@ export function createResponseListController(elements) {
     selectedId = "";
     viewerElement.hidden = true;
     listElement
-      .querySelectorAll(".dashboard-list-item--selected")
-      .forEach((item) => item.classList.remove("dashboard-list-item--selected"));
+      .querySelectorAll(".app-list-item--selected")
+      .forEach((item) => item.classList.remove("app-list-item--selected"));
   }
 
   function showResponse(response) {
@@ -31,9 +31,9 @@ export function createResponseListController(elements) {
     nameElement.textContent = response.displayName;
     viewerElement.hidden = false;
 
-    for (const item of listElement.querySelectorAll(".dashboard-list-item")) {
+    for (const item of listElement.querySelectorAll(".app-list-item")) {
       item.classList.toggle(
-        "dashboard-list-item--selected",
+        "app-list-item--selected",
         item.dataset.responseId === response.id,
       );
     }
@@ -62,7 +62,7 @@ export function createResponseListController(elements) {
     for (const response of responses) {
       const li = document.createElement("li");
       li.className =
-        "dashboard-list-item dashboard-list-item--selectable text-body-sm text-medium";
+        "app-list-item app-list-item--selectable text-body-sm text-medium";
       li.dataset.responseId = response.id;
       li.textContent = response.displayName;
       li.addEventListener("click", () => showResponse(response));

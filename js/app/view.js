@@ -101,7 +101,7 @@ function renderView(data) {
     recList.hidden = false;
     for (const rec of data.recommendations) {
       const li = document.createElement("li");
-      li.className = "dashboard-list-item";
+      li.className = "app-list-item";
 
       const time = document.createElement("span");
       time.className = "text-body-sm text-medium";

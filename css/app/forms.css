@@ -106,7 +106,7 @@ main article > section {
   margin-bottom: var(--space-xl);
 }
 
-.manage-actions {
+.respond-unlink .respond-device-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);

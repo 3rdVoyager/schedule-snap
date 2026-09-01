@@ -127,7 +127,7 @@ function renderOrganizerEvents() {
 
   for (const event of events) {
     const li = document.createElement("li");
-    li.className = "dashboard-list-item";
+    li.className = "app-list-item";
 
     const title = document.createElement("span");
     title.className = "text-body-sm text-medium";
@@ -135,7 +135,7 @@ function renderOrganizerEvents() {
     li.appendChild(title);
 
     const actions = document.createElement("span");
-    actions.className = "dashboard-list-actions";
+    actions.className = "app-list-actions";
 
     const manageBtn = document.createElement("a");
     manageBtn.href = appendToken("/app/manage/", event.manageToken);
@@ -187,7 +187,7 @@ function renderMyResponses() {
 
   for (const entry of responses) {
     const li = document.createElement("li");
-    li.className = "dashboard-list-item";
+    li.className = "app-list-item";
 
     const label = document.createElement("span");
     label.className = "text-body-sm text-medium";
@@ -195,7 +195,7 @@ function renderMyResponses() {
     li.appendChild(label);
 
     const actions = document.createElement("span");
-    actions.className = "dashboard-list-actions";
+    actions.className = "app-list-actions";
 
     const editBtn = document.createElement("a");
     editBtn.href = `/app/respond/#edit=${entry.editToken}`;

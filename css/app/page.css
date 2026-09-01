@@ -1,38 +1,166 @@
+/* Shared app page layout and reusable page components */
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.app-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
 .page-header {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 }
 
 .page-header #event-title,
 .page-header #event-description,
 .page-header #event-meta,
 .page-header #page-lead {
-    margin: 0;
+  margin: 0;
 }
 
 .page-header-windows {
-    list-style: none;
-    padding: 0;
-    margin: var(--space-xs) 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
+  list-style: none;
+  padding: 0;
+  margin: var(--space-xs) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
 .page-header-windows li {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #page-lead {
-    margin-top: var(--space-sm);
+  margin-top: var(--space-sm);
 }
 
 .card-hero .page-header {
-    gap: var(--space-sm);
+  gap: var(--space-sm);
 }
 
 .card-hero .page-header #event-title {
-    margin-bottom: 0;
+  margin-bottom: 0;
+}
+
+.page-actions {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.app-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 2px solid var(--border-subtle);
+  transition: background-color 0.15s ease;
+}
+
+.app-list-item:last-child {
+  border-bottom: none;
+}
+
+.app-list-item--selectable {
+  cursor: pointer;
+}
+
+.app-list-item--selectable:hover {
+  background: var(--primary-color-light);
+  color: var(--primary-color);
+}
+
+.app-list-item--selected {
+  background: var(--primary-color-light);
+  color: var(--primary-color);  
+}
+
+.app-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.response-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.response-viewer .text-heading {
+  margin: 0;
+}
+
+.empty-state {
+  padding: var(--space-lg);
+  border-radius: var(--button-border-radius);
+  background: var(--surface-page);
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+.empty-state p + p {
+  margin-top: var(--space-sm);
+}
+
+.empty-state a.button {
+  margin-top: var(--space-sm);
+}
+
+/* Fields inside cards outside a <form> (e.g. link copy rows on dashboard) */
+main .card-normal label {
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+main .card-normal input:not([type="checkbox"]):not([type="radio"]),
+main .card-normal select,
+main .card-normal textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--button-border-radius);
+  background: var(--surface-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+main .card-normal input:focus,
+main .card-normal select:focus,
+main .card-normal textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: var(--focus-ring);
+}
+
+main .card-normal button[type="submit"] {
+  margin-top: var(--space-sm);
+  align-self: flex-start;
 }
