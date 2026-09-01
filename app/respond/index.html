@@ -48,35 +48,8 @@
 
       <fieldset>
         <legend>When are you available?</legend>
-        <p>Select the time windows you are available.</p>
-        <div id="availability-windows">
-          <div class="availability-window-row">
-            <input
-              type="datetime-local"
-              class="availability-window-start"
-              aria-label="Availability window start"
-            />
-            <input
-              type="datetime-local"
-              class="availability-window-end"
-              aria-label="Availability window end"
-            />
-            <input
-              type="number"
-              class="availability-window-preference"
-              aria-label="Availability window preference"
-              min="1"
-              max="5"
-            />
-          </div>
-        </div>
-        <button
-          type="button"
-          class="button button-primary-outline"
-          id="add-availability-window"
-        >
-          + Add availability window
-        </button>
+        <p>Select days and drag to mark your available times.</p>
+        <div id="availability-calendar"></div>
       </fieldset>
 
       <button

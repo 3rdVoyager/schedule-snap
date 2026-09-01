@@ -10,7 +10,7 @@ import {
 const DEFAULT_RECOMMENDATION_LIMIT = 10;
 
 /** Minutes between candidate slot start times (change here to retune granularity). */
-const SLOT_START_INCREMENT_MINUTES = 5;
+const SLOT_START_INCREMENT_MINUTES = 15;
 
 function parseInstantMs(iso) {
   const ms = new Date(iso).getTime();

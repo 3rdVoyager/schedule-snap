@@ -111,3 +111,95 @@ export function utcToDatetimeLocal(iso, tz) {
   const hour = String(Number(get("hour")) % 24).padStart(2, "0");
   return `${get("year")}-${get("month")}-${get("day")}T${hour}:${get("minute")}`;
 }
+
+/** YYYY-MM-DD for an instant in the event timezone. */
+export function dateKeyInZone(iso, tz) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso));
+  const get = (type) => parts.find((p) => p.type === type).value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+/** Minutes from local midnight (0–1439) for an instant in the event timezone. */
+export function minutesInZone(iso, tz) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(iso));
+  const get = (type) => Number(parts.find((p) => p.type === type).value);
+  return (get("hour") % 24) * 60 + get("minute");
+}
+
+/** Add calendar days to a YYYY-MM-DD key in the event timezone. */
+export function addDaysToDateKey(dayKey, days, tz) {
+  const noon = zonedToUtcIso(`${dayKey}T12:00`, tz);
+  const next = new Date(new Date(noon).getTime() + days * 86400000);
+  return dateKeyInZone(next.toISOString(), tz);
+}
+
+/** Clip a scheduling window to one calendar day; returns minute bounds or null. */
+export function intersectWindowWithDay(window, dayKey, tz) {
+  const dayStartIso = zonedToUtcIso(`${dayKey}T00:00`, tz);
+  const dayEndIso = zonedToUtcIso(`${addDaysToDateKey(dayKey, 1, tz)}T00:00`, tz);
+  const winStart = new Date(window.start).getTime();
+  const winEnd = new Date(window.end).getTime();
+  const clipStart = Math.max(winStart, new Date(dayStartIso).getTime());
+  const clipEnd = Math.min(winEnd, new Date(dayEndIso).getTime());
+  if (clipStart >= clipEnd) return null;
+  const dayEndMs = new Date(dayEndIso).getTime();
+  let endMinutes = minutesInZone(new Date(clipEnd).toISOString(), tz);
+  // Midnight at the start of the next day means end-of-day, not minute 0.
+  if (clipEnd >= dayEndMs) {
+    endMinutes = 24 * 60;
+  }
+  return {
+    startMinutes: minutesInZone(new Date(clipStart).toISOString(), tz),
+    endMinutes,
+  };
+}
+
+/** Whether any scheduling window overlaps this calendar day. */
+export function isDayInSchedulingWindows(dayKey, schedulingWindows, tz) {
+  return schedulingWindows.some(
+    (w) => intersectWindowWithDay(w, dayKey, tz) !== null,
+  );
+}
+
+/** All scheduling segments (minute bounds) for one day. */
+export function getDayWindowSegments(schedulingWindows, dayKey, tz) {
+  return schedulingWindows
+    .map((w) => intersectWindowWithDay(w, dayKey, tz))
+    .filter(Boolean)
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+}
+
+/** Build a UTC ISO range from local day + minute bounds. */
+export function rangeFromDayMinutes(dayKey, startMinutes, endMinutes, tz) {
+  const fmt = (mins) => {
+    const h = String(Math.floor(mins / 60)).padStart(2, "0");
+    const m = String(mins % 60).padStart(2, "0");
+    return `${h}:${m}`;
+  };
+  const endDay =
+    endMinutes >= 24 * 60 ? addDaysToDateKey(dayKey, 1, tz) : dayKey;
+  const endMins = endMinutes >= 24 * 60 ? 0 : endMinutes;
+  return {
+    start: zonedToUtcIso(`${dayKey}T${fmt(startMinutes)}`, tz),
+    end: zonedToUtcIso(`${endDay}T${fmt(endMins)}`, tz),
+  };
+}
+
+/** Format minutes as compact label for calendar grid (no wrap). */
+export function formatMinutesLabel(minutes) {
+  const h24 = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const period = h24 >= 12 ? "p" : "a";
+  const h12 = h24 % 12 || 12;
+  return `${h12}:${String(m).padStart(2, "0")}${period}`;
+}

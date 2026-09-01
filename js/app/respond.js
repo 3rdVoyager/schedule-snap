@@ -1,6 +1,7 @@
 import { API_URL } from "./config.js";
 import { bearerAuth, jsonHeaders } from "./api-auth.js";
-import { formatInZone, utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
+import { createCalendar } from "./calendar.js";
+import { formatInZone } from "./time.js";
 import { addMyResponse, removeMyResponse, updateResponseMeta } from "./storage.js";
 import {
   parseDeepLink,
@@ -14,12 +15,14 @@ const view = document.querySelector("#event-view");
 const responseForm = document.querySelector("#response-form");
 const successEl = document.querySelector("#respond-success");
 const unlinkSection = document.querySelector("#unlink-section");
+const calendarMount = document.querySelector("#availability-calendar");
 
 let currentEvent = null;
 let currentEventCode = "";
 let editToken = "";
 let editMode = false;
 let currentResponseId = "";
+let availabilityCalendar = null;
 
 const deepLink = parseDeepLink();
 const editFromHash = deepLink.edit;
@@ -42,7 +45,7 @@ if (editFromHash.length === 32) {
 
 responseForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!currentEvent) return;
+  if (!currentEvent || !availabilityCalendar) return;
 
   statusEl.hidden = true;
   statusEl.textContent = "";
@@ -50,8 +53,7 @@ responseForm.addEventListener("submit", async (e) => {
   const displayName = document
     .querySelector("#display-name-input")
     .value.trim();
-  const timezone = currentEvent.settings.timezone;
-  const availability = collectAvailability(timezone);
+  const availability = availabilityCalendar.getRanges();
 
   if (!displayName) return;
   if (availability.length === 0) {
@@ -78,21 +80,13 @@ responseForm.addEventListener("submit", async (e) => {
   }
 });
 
-function collectAvailability(timezone) {
-  return [
-    ...document.querySelectorAll(
-      "#availability-windows .availability-window-row",
-    ),
-  ]
-    .map((row) => ({
-      start: row.querySelector(".availability-window-start").value,
-      end: row.querySelector(".availability-window-end").value,
-    }))
-    .filter((w) => w.start && w.end)
-    .map((w) => ({
-      start: zonedToUtcIso(w.start, timezone),
-      end: zonedToUtcIso(w.end, timezone),
-    }));
+function initCalendar(event, initialRanges = []) {
+  availabilityCalendar?.destroy();
+  availabilityCalendar = createCalendar(calendarMount, {
+    timezone: event.settings.timezone,
+    schedulingWindows: event.settings.schedulingWindows ?? [],
+    initialRanges,
+  });
 }
 
 async function submitCreate(payload, displayName) {
@@ -193,7 +187,7 @@ async function loadForEdit(token) {
 
     document.querySelector("#display-name-input").value =
       data.response.displayName;
-    prefillAvailability(data.response.availability, data.settings.timezone);
+    initCalendar(currentEvent, data.response.availability ?? []);
 
     responseForm.hidden = false;
     document.querySelector("#submit-response-btn").textContent =
@@ -223,32 +217,10 @@ async function loadEvent(eventCode) {
     setParticipantEventCode(eventCode);
     statusEl.hidden = true;
     renderEvent(data);
+    initCalendar(currentEvent);
     responseForm.hidden = false;
   } catch {
     statusEl.textContent = "Could not reach the server";
-  }
-}
-
-function prefillAvailability(availability, timezone) {
-  const container = document.querySelector("#availability-windows");
-  const template = container.querySelector(".availability-window-row");
-  container.replaceChildren();
-
-  for (const range of availability) {
-    const row = template.cloneNode(true);
-    row.querySelector(".availability-window-start").value = utcToDatetimeLocal(
-      range.start,
-      timezone,
-    );
-    row.querySelector(".availability-window-end").value = utcToDatetimeLocal(
-      range.end,
-      timezone,
-    );
-    container.appendChild(row);
-  }
-
-  if (availability.length === 0) {
-    container.appendChild(template.cloneNode(true));
   }
 }
 
@@ -273,17 +245,6 @@ function renderEvent(data) {
 
   view.hidden = false;
 }
-
-document
-  .querySelector("#add-availability-window")
-  .addEventListener("click", () => {
-    const template = document.querySelector(
-      "#availability-windows .availability-window-row",
-    );
-    const clone = template.cloneNode(true);
-    clone.querySelectorAll("input").forEach((input) => (input.value = ""));
-    document.querySelector("#availability-windows").appendChild(clone);
-  });
 
 document.querySelector("#copy-edit-link")?.addEventListener("click", async () => {
   const input = document.querySelector("#edit-link");
