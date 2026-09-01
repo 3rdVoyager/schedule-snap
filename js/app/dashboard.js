@@ -1,4 +1,5 @@
 import { API_URL } from "./config.js";
+import { bearerAuth } from "./api-auth.js";
 import {
   getMyResponses,
   getOrganizerEvents,
@@ -75,7 +76,9 @@ async function validateAndJoin(eventCode, nextPath) {
   hideStatus();
   showStatus("Checking event code…");
   try {
-    const response = await fetch(`${API_URL}/api/events/${eventCode}`);
+    const response = await fetch(`${API_URL}/api/events/respond`, {
+      headers: bearerAuth("event", eventCode),
+    });
     const data = await response.json();
     if (!response.ok) {
       showStatus(data.error ?? "Event not found");
@@ -93,7 +96,7 @@ async function handleOrganizerToken(manageToken, nextPath) {
   showStatus("Verifying organizer secret…");
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
-      headers: { Authorization: `Bearer ${manageToken}` },
+      headers: bearerAuth("manage", manageToken),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -175,7 +178,7 @@ function renderOrganizerEvents() {
 async function refreshOrganizerTitle(event) {
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
-      headers: { Authorization: `Bearer ${event.manageToken}` },
+      headers: bearerAuth("manage", event.manageToken),
     });
     const data = await response.json();
     if (response.ok && data.title) {

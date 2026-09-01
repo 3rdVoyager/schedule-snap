@@ -1,4 +1,5 @@
 import { API_URL } from "./config.js";
+import { bearerAuth } from "./api-auth.js";
 import {
   parseDeepLink,
   redirectToDashboard,
@@ -34,7 +35,9 @@ async function loadParticipantView(eventCode) {
   article.hidden = true;
 
   try {
-    const response = await fetch(`${API_URL}/api/events/${eventCode}/view`);
+    const response = await fetch(`${API_URL}/api/events/view`, {
+      headers: bearerAuth("event", eventCode),
+    });
     const data = await response.json();
     if (!response.ok) {
       statusEl.textContent = data.error ?? "Could not load results";
@@ -54,7 +57,7 @@ async function loadOrganizerView(token) {
 
   try {
     const response = await fetch(`${API_URL}/api/events/view`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: bearerAuth("manage", token),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -63,7 +66,7 @@ async function loadOrganizerView(token) {
     }
 
     const manageRes = await fetch(`${API_URL}/api/events/manage`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: bearerAuth("manage", token),
     });
     const manageData = await manageRes.json();
     if (manageRes.ok) {

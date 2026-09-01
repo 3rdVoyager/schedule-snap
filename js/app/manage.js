@@ -1,4 +1,5 @@
 import { API_URL } from "./config.js";
+import { bearerAuth, jsonHeaders } from "./api-auth.js";
 import { removeOrganizerEvent, updateOrganizerEventTitle } from "./storage.js";
 import {
   getActiveOrganizerEventId,
@@ -73,7 +74,7 @@ document.querySelector("#delete-event").addEventListener("click", async () => {
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${currentManageToken}` },
+      headers: bearerAuth("manage", currentManageToken),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -127,11 +128,8 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${currentManageToken}`,
-      },
+      method: "PATCH",
+      headers: jsonHeaders("manage", currentManageToken),
       body: JSON.stringify(payload),
     });
     const data = await response.json();
@@ -159,7 +157,7 @@ async function loadManage(manageToken) {
 
   try {
     const response = await fetch(`${API_URL}/api/events/manage`, {
-      headers: { Authorization: `Bearer ${manageToken}` },
+      headers: bearerAuth("manage", manageToken),
     });
     const data = await response.json();
     if (!response.ok) {

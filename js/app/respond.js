@@ -1,4 +1,5 @@
 import { API_URL } from "./config.js";
+import { bearerAuth, jsonHeaders } from "./api-auth.js";
 import { formatInZone, utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
 import { addMyResponse, removeMyResponse, updateResponseMeta } from "./storage.js";
 import {
@@ -95,14 +96,11 @@ function collectAvailability(timezone) {
 }
 
 async function submitCreate(payload, displayName) {
-  const response = await fetch(
-    `${API_URL}/api/events/${currentEventCode}/responses`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    },
-  );
+  const response = await fetch(`${API_URL}/api/events/respond`, {
+    method: "POST",
+    headers: jsonHeaders("event", currentEventCode),
+    body: JSON.stringify(payload),
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -134,12 +132,9 @@ async function submitCreate(payload, displayName) {
 }
 
 async function submitEdit(payload, displayName) {
-  const response = await fetch(`${API_URL}/api/responses/edit`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${editToken}`,
-    },
+  const response = await fetch(`${API_URL}/api/events/respond`, {
+    method: "PATCH",
+    headers: jsonHeaders("edit", editToken),
     body: JSON.stringify(payload),
   });
   const data = await response.json();
@@ -166,8 +161,8 @@ async function loadForEdit(token) {
   responseForm.hidden = true;
 
   try {
-    const response = await fetch(`${API_URL}/api/responses/edit`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`${API_URL}/api/events/respond`, {
+      headers: bearerAuth("edit", token),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -215,7 +210,9 @@ async function loadEvent(eventCode) {
   responseForm.hidden = true;
 
   try {
-    const response = await fetch(`${API_URL}/api/events/${eventCode}`);
+    const response = await fetch(`${API_URL}/api/events/respond`, {
+      headers: bearerAuth("event", eventCode),
+    });
     const data = await response.json();
     if (!response.ok) {
       statusEl.textContent = data.error ?? "Could not load event";
@@ -313,9 +310,9 @@ document.querySelector("#delete-response").addEventListener("click", async () =>
   statusEl.textContent = "Deleting…";
 
   try {
-    const response = await fetch(`${API_URL}/api/responses/edit`, {
+    const response = await fetch(`${API_URL}/api/events/respond`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${editToken}` },
+      headers: bearerAuth("edit", editToken),
     });
     const data = await response.json();
     if (!response.ok) {

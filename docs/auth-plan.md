@@ -7,10 +7,30 @@ No accounts. Access is **capability-based**: short codes and secret tokens, not 
 | Role | Credential | What they can do |
 |------|------------|------------------|
 | **Participant** | Event code | Respond; view results if sharing enabled |
-| **Respondent (returning)** | Edit token (`Bearer`) | Edit own response when allowed |
-| **Organizer** | Manage token (`Bearer`) | Full responses, manage event; always can use `/view` |
+| **Respondent (returning)** | Edit token | Edit own response when allowed |
+| **Organizer** | Manage token | Full responses, manage event; always can use `/view` |
 
 Event codes never grant manage access. Edit tokens never grant access to other responses.
+
+## API authorization
+
+All API credentials go in the `Authorization` header with a type prefix:
+
+```
+Authorization: Bearer event:12345678
+Authorization: Bearer edit:{32-hex}
+Authorization: Bearer manage:{32-hex}
+```
+
+| API surface | Header |
+|-------------|--------|
+| Respond (load/submit) | `Bearer event:{code}` |
+| Respond (edit load/update/delete) | `Bearer edit:{token}` |
+| View (participant) | `Bearer event:{code}` |
+| View (organizer) | `Bearer manage:{token}` |
+| Manage | `Bearer manage:{token}` |
+
+Page share links still use query/hash (see below). The frontend reads those and sends prefixed Bearer on API calls.
 
 ## App dashboard (`/app/`)
 
@@ -23,7 +43,7 @@ Central entry for this device:
 
 Pages without credentials redirect to `/app/?next=…`. Deep links (`?code=`, `#token=`, `#edit=`) skip the dashboard.
 
-## Links
+## Page links (share URLs)
 
 | Link | URL |
 |------|-----|
@@ -50,10 +70,11 @@ Not synced across devices; no server-side account list in v1.
 ## Access rules
 
 ```
-Respond / read event metadata     → event code
-Edit own response                 → edit token (Bearer)
-View results                      → event code IF resultsVisibleToParticipants, else organizer secret
-Full responses / manage event     → organizer secret only
+Respond / read event metadata     → Bearer event:{code}
+Edit own response                 → Bearer edit:{token}
+View results (participant)        → Bearer event:{code} IF resultsVisibleToParticipants
+View results (organizer)          → Bearer manage:{token}
+Full responses / manage event     → Bearer manage:{token}
 ```
 
 Endpoints: `docs/api.md`

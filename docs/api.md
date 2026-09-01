@@ -6,94 +6,96 @@ JSON in/out. Errors: `{ "error": "message" }` with 4xx/5xx.
 
 ## Auth
 
-| Capability | Credential |
-|------------|------------|
-| View event (respond UI), submit response | Event code (path) |
-| Edit own response | Edit token (Bearer) |
-| View results + recommendations | Event code if `resultsVisibleToParticipants`, else organizer secret (Bearer) |
-| Full responses list, edit event | Organizer secret (Bearer) only |
+All credentials use the `Authorization` header with typed Bearer prefixes. **No credentials in API paths or query strings.**
 
-- **Manage token** returned once on create (`201`). Organizer routes: `WHERE manage_token = ?`.
-- **Edit token** returned once on response submit (`201`). Edit routes: `WHERE edit_token = ?`.
+```
+Authorization: Bearer event:12345678
+Authorization: Bearer edit:a1b2c3d4…   (32 hex)
+Authorization: Bearer manage:a1b2c3d4… (32 hex)
+```
 
-**Frontend:** Dashboard `/app/` · create `/app/create/` · respond `/app/respond/?code={eventCode}` or `#edit={editToken}` · view/manage use codes or `#token=` (see `docs/auth-plan.md`).
+| Type | Value | Grants |
+|------|-------|--------|
+| `event` | 8-digit event code | Load event for respond; submit response; view results (if allowed) |
+| `edit` | 32 hex edit token | Load, update, or delete own response |
+| `manage` | 32 hex manage token | View results, manage event, full response list |
 
-Details: `docs/auth-plan.md`
+- **Manage token** returned once on create (`201`).
+- **Edit token** returned once on response submit (`201`).
+- Malformed or missing prefix → `401`. Wrong type for route → `401`.
 
-## Three read surfaces
+**Frontend page URLs** (share links) still use `?code=`, `#edit=`, `#token=` — see `docs/auth-plan.md`. Only API calls use prefixed Bearer headers.
 
-| Surface | API | Audience | Contents |
-|---------|-----|----------|----------|
-| **Event** | `GET …/:eventCode` | Anyone with code | Metadata + settings to respond — no responses, no recommendations |
-| **View** | `GET …/:eventCode/view` or `GET …/view` | Code (if allowed) or Bearer | Recommendations + visible results |
-| **Manage** | `GET …/manage` | Bearer only | Event + full raw responses |
+## Three surfaces
+
+| Surface | Path | Auth | Contents |
+|---------|------|------|----------|
+| **Respond** | `/api/events/respond` | `event:` or `edit:` | Event metadata; submit/update/delete response |
+| **View** | `/api/events/view` | `event:` or `manage:` | Recommendations + visible results |
+| **Manage** | `/api/events/manage` | `manage:` | Event + full raw responses |
 
 ---
 
 ## Endpoint details
 
-### `POST /api/events` — create
+### `POST /api/events/create` — create
 
-**201:** `{ id, eventCode, manageToken }`
+No auth · **201:** `{ id, eventCode, manageToken }`
 
-### `GET /api/events/:eventCode` — event (respond)
+### `GET /api/events/respond` — load (new respond)
 
-**200:** event metadata · **404**
+`Bearer event:{code}` · **200:** event metadata · **401** · **404**
 
-### `POST /api/events/:eventCode/responses` — submit response
+### `GET /api/events/respond` — load (edit)
 
-**201:** `{ id, editToken }` · **400** · **404**
+`Bearer edit:{token}` · **200:** event metadata + `response` · **401** · **404**
 
-### `GET /api/responses/edit` — load own response
+### `POST /api/events/respond` — submit response
 
-**Bearer** (edit token) · **200:** event metadata + `response` · **401** · **404**
+`Bearer event:{code}` · **201:** `{ id, editToken }` · **400** · **401** · **404**
 
-### `PUT /api/responses/edit` — update own response
+### `PATCH /api/events/respond` — update response
 
-**Bearer** (edit token) · respects `settings.allowResponseEdits` · **200:** `{ id, editToken }` · **403** · **404**
+`Bearer edit:{token}` · respects `settings.allowResponseEdits` · **200:** `{ id, editToken }` · **403** · **404**
 
-### `GET /api/events/:eventCode/view` — results (participant)
+### `DELETE /api/events/respond` — delete response
 
-Event code · **403** if results not shared · **404**
+`Bearer edit:{token}` · **200:** `{ ok: true }` · **401** · **404**
+
+### `GET /api/events/view` — results (participant)
+
+`Bearer event:{code}` · **403** if results not shared · **404**
 
 ### `GET /api/events/view` — results (organizer)
 
-**Bearer** (organizer secret) · **200** · **401** · **404**
+`Bearer manage:{token}` · **200** · **401** · **404**
 
-### `GET /api/events/manage` — organizer
+### `GET /api/events/manage` — organizer load
 
-**Bearer** · **200:** event + `responses[]` · **401** · **404**
+`Bearer manage:{token}` · **200:** event + `responses[]` · **401** · **404**
 
-### `PUT /api/events/manage` — update event
+### `PATCH /api/events/manage` — update event
 
-**Bearer** · body: `{ title, description, settings }` (same shape as create) · **200:** updated event + `responses[]` · **400** · **401** · **404**
+`Bearer manage:{token}` · body: `{ title, description, settings }` (same shape as create) · **200:** updated event + `responses[]` · **400** · **401** · **404**
 
 ### `DELETE /api/events/manage` — delete event
 
-**Bearer** · **200:** `{ ok: true }` · **401** · **404** — permanently deletes event and all responses
-
-### `DELETE /api/responses/edit` — delete own response
-
-**Bearer** (edit token) · **200:** `{ ok: true }` · **401** · **404**
+`Bearer manage:{token}` · **200:** `{ ok: true }` · **401** · **404** — permanently deletes event and all responses
 
 ---
 
 ## Endpoint index
 
-| Method | Path | Auth | Status | Purpose |
-|--------|------|------|--------|---------|
-| `POST` | `/api/events` | — | Built | Create event |
-| `GET` | `/api/events/:eventCode` | Event code | Built | Event metadata |
-| `POST` | `/api/events/:eventCode/responses` | Event code | Built | Submit response |
-| `GET` | `/api/responses/edit` | Bearer (edit) | Built | Load own response |
-| `PUT` | `/api/responses/edit` | Bearer (edit) | Built | Update own response |
-| `GET` | `/api/events/:eventCode/view` | Event code* | Built | Participant results |
-| `GET` | `/api/events/view` | Bearer | Built | Organizer results |
-| `GET` | `/api/events/manage` | Bearer | Built | Organizer manage |
-| `PUT` | `/api/events/manage` | Bearer | Built | Edit event settings |
-| `DELETE` | `/api/events/manage` | Bearer | Built | Delete event + responses |
-| `DELETE` | `/api/responses/edit` | Bearer (edit) | Built | Delete own response |
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| `POST` | `/api/events/create` | — | Create event |
+| `GET` | `/api/events/respond` | `event:` or `edit:` | Load event (or event + response for edit) |
+| `POST` | `/api/events/respond` | `event:` | Submit response |
+| `PATCH` | `/api/events/respond` | `edit:` | Update response |
+| `DELETE` | `/api/events/respond` | `edit:` | Delete response |
+| `GET` | `/api/events/view` | `event:`* or `manage:` | View results |
+| `GET` | `/api/events/manage` | `manage:` | Organizer manage load |
+| `PATCH` | `/api/events/manage` | `manage:` | Update event settings |
+| `DELETE` | `/api/events/manage` | `manage:` | Delete event + responses |
 
-\*Only when `resultsVisibleToParticipants` is true.
-
-`:eventCode` — 8 digits. Edit/organizer Bearer tokens — 32 hex chars.
+\*Participant view only when `resultsVisibleToParticipants` is true.

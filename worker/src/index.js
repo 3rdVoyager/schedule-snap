@@ -1,4 +1,4 @@
-import { requireBearer } from "./auth.js";
+import { parseBearerAuth, requireBearerType } from "./auth.js";
 import { createEvent } from "./create.js";
 import { corsHeaders, json } from "./lib.js";
 import { getManageEvent, updateManageEvent, deleteManageEvent } from "./manage.js";
@@ -19,53 +19,69 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    // POST /api/events
+    // POST /api/events/create
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      !segments[3] &&
+      segments[3] === "create" &&
+      !segments[4] &&
       request.method === "POST"
     ) {
       return createEvent(request, env);
     }
 
-    // GET /api/events/manage
+    // GET /api/events/respond
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      segments[3] === "manage" &&
+      segments[3] === "respond" &&
       !segments[4] &&
       request.method === "GET"
     ) {
-      const auth = requireBearer(request);
+      const auth = parseBearerAuth(request);
       if (auth.error) return auth.error;
-      return getManageEvent(env, auth.token);
+      if (auth.type === "event") return getEventByCode(env, auth.value);
+      if (auth.type === "edit") return getResponseForEdit(env, auth.value);
+      return json({ error: "Authorization required" }, 401);
     }
 
-    // PUT /api/events/manage
+    // POST /api/events/respond
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      segments[3] === "manage" &&
+      segments[3] === "respond" &&
       !segments[4] &&
-      request.method === "PUT"
+      request.method === "POST"
     ) {
-      const auth = requireBearer(request);
+      const auth = requireBearerType(request, "event");
       if (auth.error) return auth.error;
-      return updateManageEvent(request, env, auth.token);
+      return submitResponse(request, env, auth.value);
     }
 
-    // DELETE /api/events/manage
+    // PATCH /api/events/respond
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      segments[3] === "manage" &&
+      segments[3] === "respond" &&
+      !segments[4] &&
+      request.method === "PATCH"
+    ) {
+      const auth = requireBearerType(request, "edit");
+      if (auth.error) return auth.error;
+      return updateResponse(request, env, auth.value);
+    }
+
+    // DELETE /api/events/respond
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] === "respond" &&
       !segments[4] &&
       request.method === "DELETE"
     ) {
-      const auth = requireBearer(request);
+      const auth = requireBearerType(request, "edit");
       if (auth.error) return auth.error;
-      return deleteManageEvent(env, auth.token);
+      return deleteResponse(env, auth.value);
     }
 
     // GET /api/events/view
@@ -76,82 +92,50 @@ export default {
       !segments[4] &&
       request.method === "GET"
     ) {
-      const auth = requireBearer(request);
+      const auth = parseBearerAuth(request);
       if (auth.error) return auth.error;
-      return getOrganizerView(env, auth.token);
+      if (auth.type === "event") return getParticipantView(env, auth.value);
+      if (auth.type === "manage") return getOrganizerView(env, auth.value);
+      return json({ error: "Authorization required" }, 401);
     }
 
-    // GET /api/events/:eventCode/view
+    // GET /api/events/manage
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      segments[3] &&
-      segments[4] === "view" &&
-      !segments[5] &&
+      segments[3] === "manage" &&
+      !segments[4] &&
       request.method === "GET"
     ) {
-      return getParticipantView(env, segments[3]);
+      const auth = requireBearerType(request, "manage");
+      if (auth.error) return auth.error;
+      return getManageEvent(env, auth.value);
     }
 
-    // GET /api/events/:eventCode
+    // PATCH /api/events/manage
     if (
       segments[1] === "api" &&
       segments[2] === "events" &&
-      segments[3] &&
+      segments[3] === "manage" &&
       !segments[4] &&
-      request.method === "GET"
+      request.method === "PATCH"
     ) {
-      return getEventByCode(env, segments[3]);
-    }
-
-    // GET /api/responses/edit
-    if (
-      segments[1] === "api" &&
-      segments[2] === "responses" &&
-      segments[3] === "edit" &&
-      !segments[4] &&
-      request.method === "GET"
-    ) {
-      const auth = requireBearer(request);
+      const auth = requireBearerType(request, "manage");
       if (auth.error) return auth.error;
-      return getResponseForEdit(env, auth.token);
+      return updateManageEvent(request, env, auth.value);
     }
 
-    // PUT /api/responses/edit
+    // DELETE /api/events/manage
     if (
       segments[1] === "api" &&
-      segments[2] === "responses" &&
-      segments[3] === "edit" &&
-      !segments[4] &&
-      request.method === "PUT"
-    ) {
-      const auth = requireBearer(request);
-      if (auth.error) return auth.error;
-      return updateResponse(request, env, auth.token);
-    }
-
-    // DELETE /api/responses/edit
-    if (
-      segments[1] === "api" &&
-      segments[2] === "responses" &&
-      segments[3] === "edit" &&
+      segments[2] === "events" &&
+      segments[3] === "manage" &&
       !segments[4] &&
       request.method === "DELETE"
     ) {
-      const auth = requireBearer(request);
+      const auth = requireBearerType(request, "manage");
       if (auth.error) return auth.error;
-      return deleteResponse(env, auth.token);
-    }
-
-    // POST /api/events/:eventCode/responses
-    if (
-      segments[1] === "api" &&
-      segments[2] === "events" &&
-      segments[3] &&
-      segments[4] === "responses" &&
-      request.method === "POST"
-    ) {
-      return submitResponse(request, env, segments[3]);
+      return deleteManageEvent(env, auth.value);
     }
 
     return json({ message: "Not found" }, 404);

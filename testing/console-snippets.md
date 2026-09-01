@@ -67,7 +67,7 @@ document.querySelector("#join-form").requestSubmit();
 Run in the console on any page (uses local API directly).
 
 ```js
-fetch("http://127.0.0.1:8787/api/events", {
+fetch("http://127.0.0.1:8787/api/events/create", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -92,5 +92,14 @@ fetch("http://127.0.0.1:8787/api/events", {
     console.log(data);
     console.log(`Respond: http://localhost:3000/app/respond/?code=${data.eventCode}`);
     console.log(`Manage: http://localhost:3000/app/manage/#token=${data.manageToken}`);
+    console.log(`API auth example: Authorization: Bearer event:${data.eventCode}`);
   });
+```
+
+Example respond load via API:
+
+```js
+fetch("http://127.0.0.1:8787/api/events/respond", {
+  headers: { Authorization: "Bearer event:YOUR_EVENT_CODE" },
+}).then((r) => r.json()).then(console.log);
 ```
