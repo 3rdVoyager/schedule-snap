@@ -8,6 +8,7 @@ import {
   setActiveOrganizerEventId,
   setParticipantEventCode,
 } from "./session.js";
+import { formatInZone } from "./time.js";
 
 const statusEl = document.querySelector("#view-status");
 const article = document.querySelector("#view-article");
@@ -78,22 +79,54 @@ async function loadOrganizerView(token) {
 }
 
 function renderView(data) {
+  const timezone = data.settings?.timezone ?? "UTC";
+
   document.querySelector("#event-title").textContent = data.title;
 
   const recList = document.querySelector("#recommendations-list");
+  const recEmpty = document.querySelector("#recommendations-empty");
   recList.replaceChildren();
+
   if (data.recommendations.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No recommendations yet.";
-    recList.appendChild(li);
+    recList.hidden = true;
+    recEmpty.hidden = false;
+  } else {
+    recEmpty.hidden = true;
+    recList.hidden = false;
+    for (const rec of data.recommendations) {
+      const li = document.createElement("li");
+      li.className = "dashboard-list-item";
+
+      const time = document.createElement("span");
+      time.className = "view-list-time";
+      time.textContent = `${formatInZone(rec.start, timezone)} – ${formatInZone(rec.end, timezone)}`;
+
+      const meta = document.createElement("span");
+      meta.className = "view-list-meta";
+      meta.textContent = `${rec.availableCount} of ${rec.totalResponses} available`;
+
+      li.append(time, meta);
+      recList.appendChild(li);
+    }
   }
 
   const resList = document.querySelector("#responses-list");
+  const resEmpty = document.querySelector("#responses-empty");
   resList.replaceChildren();
-  for (const r of data.responses) {
-    const li = document.createElement("li");
-    li.textContent = r.displayName;
-    resList.appendChild(li);
+
+  if (data.responses.length === 0) {
+    resList.hidden = true;
+    resEmpty.hidden = false;
+  } else {
+    resEmpty.hidden = true;
+    resList.hidden = false;
+    for (const r of data.responses) {
+      const li = document.createElement("li");
+      li.className = "dashboard-list-item";
+      li.textContent = r.displayName;
+      resList.appendChild(li);
+    }
   }
+
   article.hidden = false;
 }

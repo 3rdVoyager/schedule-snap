@@ -2,7 +2,6 @@ import { API_URL } from "./config.js";
 import { formatInZone, utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
 import { addMyResponse, updateResponseMeta } from "./registry.js";
 import {
-  normalizeEditToken,
   parseDeepLink,
   redirectToDashboard,
   resolveParticipantCode,
