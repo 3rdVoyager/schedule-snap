@@ -360,6 +360,7 @@ export function createCalendar(container, options) {
     }
 
     root.appendChild(layout);
+    renderAllRangesList();
 
     const timeGrid = root.querySelector(".calendar-time-grid");
     if (timeGrid) {
@@ -509,19 +510,25 @@ export function createCalendar(container, options) {
     grid.appendChild(overlay);
     panel.appendChild(grid);
     paintBlocks(overlay, grid, minMinute, maxMinute);
-    renderRangeList(panel);
 
     return panel;
   }
 
-  function renderRangeList(panel) {
-    const dayRanges = rangesOnDay(selectedDay);
-    if (dayRanges.length === 0) return;
+  function renderAllRangesList() {
+    if (ranges.length === 0) return;
+
+    const section = document.createElement("div");
+    section.className = "calendar-ranges";
+
+    const heading = document.createElement("p");
+    heading.className = "text-body-sm text-semibold";
+    heading.textContent = isReadOnly ? "Availability" : "Selected times";
+    section.appendChild(heading);
 
     const list = document.createElement("ul");
     list.className = "calendar-range-list";
 
-    for (const range of dayRanges) {
+    for (const range of ranges) {
       const li = document.createElement("li");
       li.className = "calendar-range-item text-sub";
 
@@ -529,20 +536,21 @@ export function createCalendar(container, options) {
       text.textContent = `${formatInZone(range.start, timezone)} – ${formatInZone(range.end, timezone)}`;
       li.appendChild(text);
 
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "calendar-range-remove";
-      removeBtn.setAttribute("aria-label", "Remove this time range");
-      removeBtn.textContent = "×";
-      removeBtn.addEventListener("click", () => removeRange(range));
       if (!isReadOnly) {
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "calendar-range-remove";
+        removeBtn.setAttribute("aria-label", "Remove this time range");
+        removeBtn.textContent = "×";
+        removeBtn.addEventListener("click", () => removeRange(range));
         li.appendChild(removeBtn);
       }
 
       list.appendChild(li);
     }
 
-    panel.appendChild(list);
+    section.appendChild(list);
+    root.appendChild(section);
   }
 
   function startDrag(minute, e) {
