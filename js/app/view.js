@@ -10,10 +10,18 @@ import {
   setParticipantEventCode,
 } from "./session.js";
 import { populatePageHeader } from "./page-header.js";
+import { createResponseListController } from "./response-viewer.js";
 import { showToast } from "./toast.js";
 import { formatInZone } from "./time.js";
 
 const article = document.querySelector("#view-article");
+
+const responseViewer = createResponseListController({
+  listElement: document.querySelector("#responses-list"),
+  viewerElement: document.querySelector("#response-viewer"),
+  nameElement: document.querySelector("#response-viewer-name"),
+  calendarMount: document.querySelector("#response-viewer-calendar"),
+});
 
 const deepLink = parseDeepLink();
 const manageToken = resolveManageToken();
@@ -110,20 +118,15 @@ function renderView(data) {
 
   const resList = document.querySelector("#responses-list");
   const resEmpty = document.querySelector("#responses-empty");
-  resList.replaceChildren();
 
   if (data.responses.length === 0) {
     resList.hidden = true;
     resEmpty.hidden = false;
+    responseViewer.hideViewer();
   } else {
     resEmpty.hidden = true;
     resList.hidden = false;
-    for (const r of data.responses) {
-      const li = document.createElement("li");
-      li.className = "dashboard-list-item text-body-sm text-medium";
-      li.textContent = r.displayName;
-      resList.appendChild(li);
-    }
+    responseViewer.render(data.responses, data.settings);
   }
 
   article.hidden = false;

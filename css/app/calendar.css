@@ -213,6 +213,18 @@
   cursor: default;
 }
 
+.calendar--view .calendar-month {
+  width: 220px;
+}
+
+.calendar--view .calendar-time-grid {
+  max-height: 200px;
+}
+
+.calendar--view .calendar-time-slot-track {
+  cursor: default;
+}
+
 .calendar-range-list {
   list-style: none;
   margin: 0;

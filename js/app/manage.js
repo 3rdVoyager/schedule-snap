@@ -11,6 +11,7 @@ import {
 import { populatePageHeader } from "./page-header.js";
 import { createCalendar } from "./calendar.js";
 import { initTabs } from "./tabs.js";
+import { createResponseListController } from "./response-viewer.js";
 import { showToast } from "./toast.js";
 
 const view = document.querySelector("#manage-view");
@@ -23,6 +24,13 @@ initTabs(document.querySelector("#manage-tabs"), { defaultTab: "links" });
 let schedulingCalendar = null;
 let currentManageToken = "";
 let currentEventId = "";
+
+const responseViewer = createResponseListController({
+  listElement: document.querySelector("#responses-list"),
+  viewerElement: document.querySelector("#response-viewer"),
+  nameElement: document.querySelector("#response-viewer-name"),
+  calendarMount: document.querySelector("#response-viewer-calendar"),
+});
 
 const manageToken = resolveManageToken();
 
@@ -210,20 +218,15 @@ function renderResponses(data) {
 
   const list = document.querySelector("#responses-list");
   const empty = document.querySelector("#responses-empty");
-  list.replaceChildren();
 
   if (data.responses.length === 0) {
     list.hidden = true;
     empty.hidden = false;
+    responseViewer.hideViewer();
     return;
   }
 
   empty.hidden = true;
   list.hidden = false;
-  for (const r of data.responses) {
-    const li = document.createElement("li");
-    li.className = "dashboard-list-item text-body-sm text-medium";
-    li.textContent = r.displayName;
-    list.appendChild(li);
-  }
+  responseViewer.render(data.responses, data.settings);
 }

@@ -22,10 +22,11 @@ function snapMinute(minute, mode) {
 
 /**
  * @param {HTMLElement} container
- * @param {{ mode?: "availability" | "scheduling", timezone: string, schedulingWindows?: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], onChange?: () => void }} options
+ * @param {{ mode?: "availability" | "scheduling" | "view", timezone: string, schedulingWindows?: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], onChange?: () => void }} options
  */
 export function createCalendar(container, options) {
   const mode = options.mode ?? "availability";
+  const isReadOnly = mode === "view";
   let timezone = options.timezone;
   const schedulingWindows = options.schedulingWindows ?? [];
   const { onChange } = options;
@@ -42,6 +43,9 @@ export function createCalendar(container, options) {
   root.className = "calendar";
   if (mode === "scheduling") {
     root.classList.add("calendar--scheduling");
+  }
+  if (isReadOnly) {
+    root.classList.add("calendar--view");
   }
   container.replaceChildren(root);
 
@@ -415,12 +419,14 @@ export function createCalendar(container, options) {
   ) {
     const topPx = rowOffsetPx(grid, startMin, baseMin);
     const heightPx = rowSpanPx(grid, startMin, endMin);
-    const block = document.createElement("button");
-    block.type = "button";
+    const block = document.createElement(isReadOnly ? "div" : "button");
+    if (!isReadOnly) {
+      block.type = "button";
+    }
     block.className = className;
     block.style.top = `${topPx}px`;
     block.style.height = `${heightPx}px`;
-    if (rangeRef) {
+    if (rangeRef && !isReadOnly) {
       block.title = "Click to remove";
       block.setAttribute(
         "aria-label",
@@ -446,11 +452,13 @@ export function createCalendar(container, options) {
 
     const hint = document.createElement("p");
     hint.className = "text-sub";
-    hint.textContent =
-      mode === "scheduling"
-        ? "Drag on the grid to add a window. Click a block to remove it."
-        : "Drag empty slots to add time. Click a block to remove it.";
-    panel.appendChild(hint);
+    if (!isReadOnly) {
+      hint.textContent =
+        mode === "scheduling"
+          ? "Drag on the grid to add a window. Click a block to remove it."
+          : "Drag empty slots to add time. Click a block to remove it.";
+      panel.appendChild(hint);
+    }
 
     const segments = getSegmentsForDay(selectedDay);
     if (segments.length === 0) return panel;
@@ -485,7 +493,7 @@ export function createCalendar(container, options) {
       track.className = "calendar-time-slot-track";
       row.appendChild(track);
 
-      if (allowed && !occupied) {
+      if (allowed && !occupied && !isReadOnly) {
         row.addEventListener("mousedown", (e) => startDrag(m, e));
         row.addEventListener("touchstart", (e) => {
           e.preventDefault();
@@ -527,7 +535,9 @@ export function createCalendar(container, options) {
       removeBtn.setAttribute("aria-label", "Remove this time range");
       removeBtn.textContent = "×";
       removeBtn.addEventListener("click", () => removeRange(range));
-      li.appendChild(removeBtn);
+      if (!isReadOnly) {
+        li.appendChild(removeBtn);
+      }
 
       list.appendChild(li);
     }
@@ -536,6 +546,7 @@ export function createCalendar(container, options) {
   }
 
   function startDrag(minute, e) {
+    if (isReadOnly) return;
     if (e.button !== undefined && e.button !== 0) return;
     if (e.target.closest(".calendar-time-block")) return;
     isDragging = true;
