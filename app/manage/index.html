@@ -39,61 +39,61 @@
             <p class="text-body text-muted" id="event-description" hidden></p>
             <p class="text-sub" id="event-meta"></p>
             <ul class="page-header-windows" id="event-windows"></ul>
-            <p class="text-body text-muted" id="page-lead">
-              Update settings and share links for this event.
-            </p>
           </div>
         </header>
 
-        <div class="card card-bold">
-          <div class="card-grid">
-            <section class="section">
-              <h2 class="text-heading">Share with participants</h2>
-              <p class="text-sub">Event code: <strong id="event-code" class="text-code"></strong></p>
-              <div class="card card-normal">
-                <label class="text-body-sm text-semibold" for="respond-link">Participant link</label>
-                <input
-                  type="text"
-                  class="text-input"
-                  id="respond-link"
-                  readonly
-                  spellcheck="false"
-                />
-                <button
-                  type="button"
-                  class="button button-secondary-outline"
-                  id="copy-respond-link"
-                >
-                  Copy participant link
-                </button>
+        <div id="manage-tabs" class="tabs">
+          <div class="tabs__panels">
+            <section data-tab-panel="links" data-tab-label="Links" class="card card-bold">
+              <div class="card-grid">
+                <section class="section">
+                  <h2 class="text-heading">Share with participants</h2>
+                  <p class="text-sub">Share this link so participants can submit their availability.</p>
+                  <div class="card card-normal">
+                    <label class="text-body-sm text-semibold" for="respond-link">Participant link</label>
+                    <input
+                      type="text"
+                      class="text-input"
+                      id="respond-link"
+                      readonly
+                      spellcheck="false"
+                    />
+                    <button
+                      type="button"
+                      class="button button-secondary-outline"
+                      id="copy-respond-link"
+                    >
+                      Copy participant link
+                    </button>
+                  </div>
+                </section>
+
+                <section class="section">
+                  <h2 class="text-heading">Your organizer access</h2>
+                  <p class="text-sub">Anyone with this link can manage the event and view responses.</p>
+                  <div class="card card-normal">
+                    <label class="text-body-sm text-semibold" for="organizer-link">Organizer link</label>
+                    <input
+                      type="text"
+                      class="text-input"
+                      id="organizer-link"
+                      readonly
+                      spellcheck="false"
+                    />
+                    <button
+                      type="button"
+                      class="button button-secondary-outline"
+                      id="copy-organizer-link"
+                    >
+                      Copy organizer link
+                    </button>
+                  </div>
+                </section>
               </div>
             </section>
 
-            <section class="section">
-              <h2 class="text-heading">Your organizer access</h2>
-              <p class="text-sub">Anyone with this link can manage the event and view responses.</p>
-              <div class="card card-normal">
-                <label class="text-body-sm text-semibold" for="organizer-link">Organizer link</label>
-                <input
-                  type="text"
-                  class="text-input"
-                  id="organizer-link"
-                  readonly
-                  spellcheck="false"
-                />
-                <button
-                  type="button"
-                  class="button button-secondary-outline"
-                  id="copy-organizer-link"
-                >
-                  Copy organizer link
-                </button>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <form id="manage-event-form" class="card-stack">
+            <section data-tab-panel="settings" data-tab-label="Settings">
+              <form id="manage-event-form" class="card-stack">
           <fieldset class="card card-normal section">
             <legend class="text-heading">Event details</legend>
             <div class="form-field">
@@ -194,49 +194,63 @@
               </label>
             </div>
           </fieldset>
-          <button type="submit" class="button button-primary">
-            Save changes
-          </button>
-        </form>
+              <button type="submit" class="button button-primary">
+                Save changes
+              </button>
+            </form>
+            </section>
 
-        <section class="card card-normal section manage-responses">
-          <h2 class="text-heading">Responses</h2>
-          <p class="text-sub" id="response-count"></p>
-          <p id="responses-empty" class="empty-state text-sub text-center" hidden>
-            No responses yet. Share the participant link above.
-          </p>
-          <ul id="responses-list" class="dashboard-list"></ul>
-        </section>
+            <section
+              data-tab-panel="responses"
+              data-tab-label="Responses"
+              class="card card-normal section manage-responses"
+            >
+              <h2 class="text-heading">Responses</h2>
+              <p class="text-sub" id="response-count"></p>
+              <p id="responses-empty" class="empty-state text-sub text-center" hidden>
+                No responses yet. Share the participant link from the Links tab.
+              </p>
+              <ul id="responses-list" class="dashboard-list"></ul>
+            </section>
 
-        <section class="card card-normal section manage-delete">
-          <h2 class="text-heading">Delete event</h2>
-          <p class="text-sub">
-            Permanently delete this event and all responses. This cannot be
-            undone.
-          </p>
-          <button
-            type="button"
-            class="button button-secondary-outline"
-            id="delete-event"
-          >
-            Delete event
-          </button>
-        </section>
-
-        <section class="card card-normal section manage-unlink">
-          <h2 class="text-heading">This device</h2>
-          <p class="text-sub">
-            Remove this event from your dashboard on this device. The event and
-            responses remain on the server.
-          </p>
-          <button
-            type="button"
-            class="button button-secondary-outline"
-            id="unlink-event"
-          >
-            Remove from this device
-          </button>
-        </section>
+            <section
+              data-tab-panel="danger"
+              data-tab-label="Danger zone"
+              class="card card-normal manage-remove"
+            >
+              <div class="card-grid">
+                <section class="section">
+                  <h2 class="text-heading">Delete event</h2>
+                  <p class="text-sub">
+                    Permanently delete this event and all responses. This cannot be
+                    undone.
+                  </p>
+                  <button
+                    type="button"
+                    class="button button-secondary-outline"
+                    id="delete-event"
+                  >
+                    Delete event
+                  </button>
+                </section>
+                <section class="section">
+                  <h2 class="text-heading">This device</h2>
+                  <p class="text-sub">
+                    Remove this event from your dashboard on this device. The event
+                    and responses remain on the server.
+                  </p>
+                  <button
+                    type="button"
+                    class="button button-secondary-outline"
+                    id="unlink-event"
+                  >
+                    Remove from this device
+                  </button>
+                </section>
+              </div>
+            </section>
+          </div>
+        </div>
 
         <p class="manage-actions">
           <a

@@ -9,11 +9,14 @@ import {
   setActiveOrganizerEventId,
 } from "./session.js";
 import { populatePageHeader } from "./page-header.js";
+import { initTabs } from "./tabs.js";
 import { showToast } from "./toast.js";
 import { utcToDatetimeLocal, zonedToUtcIso } from "./time.js";
 
 const view = document.querySelector("#manage-view");
 const form = document.querySelector("#manage-event-form");
+
+initTabs(document.querySelector("#manage-tabs"), { defaultTab: "links" });
 
 let currentManageToken = "";
 let currentEventId = "";
@@ -171,9 +174,8 @@ async function loadManage(manageToken) {
 
 function renderManage(data, manageToken) {
   populatePageHeader(document.querySelector("#page-header"), data);
-  document.querySelector("#page-lead").textContent =
-    `Event code ${data.eventCode} · update settings and share links.`;
-  document.querySelector("#event-code").textContent = data.eventCode;
+  document.querySelector("#event-meta").textContent +=
+    ` · ${data.eventCode}`;
   document.querySelector("#respond-link").value =
     `${window.location.origin}/app/respond/?code=${data.eventCode}`;
   document.querySelector("#organizer-link").value =
