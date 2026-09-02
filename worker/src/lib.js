@@ -151,6 +151,55 @@ export function validateAvailability(raw) {
   return { availability };
 }
 
+function availabilityKey(range) {
+  return `${range.start}|${range.end}`;
+}
+
+export function validatePreferences(raw, availability) {
+  if (raw === null || raw === undefined) {
+    if (availability.length === 0) {
+      return { preferences: null };
+    }
+    const preferences = {};
+    for (const range of availability) {
+      preferences[availabilityKey(range)] = 3;
+    }
+    return { preferences };
+  }
+
+  if (typeof raw !== "object" || Array.isArray(raw)) {
+    return { error: "preferences must be an object" };
+  }
+
+  const allowedKeys = new Set(availability.map(availabilityKey));
+  const preferences = {};
+
+  for (const range of availability) {
+    const key = availabilityKey(range);
+    const value = raw[key];
+    if (value === undefined) {
+      preferences[key] = 3;
+      continue;
+    }
+    if (!Number.isInteger(value) || value < 1 || value > 5) {
+      return {
+        error: `preferences["${key}"] must be an integer from 1 to 5`,
+      };
+    }
+    preferences[key] = value;
+  }
+
+  for (const key of Object.keys(raw)) {
+    if (!allowedKeys.has(key)) {
+      return {
+        error: `preferences key "${key}" does not match any availability range`,
+      };
+    }
+  }
+
+  return { preferences };
+}
+
 export async function getEventByManageToken(env, manageToken) {
   return env.DB.prepare("SELECT * FROM events WHERE manage_token = ?")
     .bind(manageToken)

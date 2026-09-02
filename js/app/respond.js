@@ -62,7 +62,7 @@ responseForm.addEventListener("submit", async (e) => {
   const payload = {
     displayName,
     availability: availability.map(({ start, end }) => ({ start, end })),
-    preferences: null,
+    preferences: availabilityCalendar.getPreferences(),
   };
 
   try {
@@ -76,12 +76,13 @@ responseForm.addEventListener("submit", async (e) => {
   }
 });
 
-function initCalendar(event, initialRanges = []) {
+function initCalendar(event, initialRanges = [], initialPreferences = {}) {
   availabilityCalendar?.destroy();
   availabilityCalendar = createCalendar(calendarMount, {
     timezone: event.settings.timezone,
     schedulingWindows: event.settings.schedulingWindows ?? [],
     initialRanges,
+    initialPreferences,
   });
 }
 
@@ -178,7 +179,11 @@ async function loadForEdit(token) {
 
     document.querySelector("#display-name-input").value =
       data.response.displayName;
-    initCalendar(currentEvent, data.response.availability ?? []);
+    initCalendar(
+      currentEvent,
+      data.response.availability ?? [],
+      data.response.preferences ?? {},
+    );
 
     responseForm.hidden = false;
     document.querySelector("#submit-response-btn").textContent =

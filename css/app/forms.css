@@ -31,12 +31,12 @@ main form fieldset > p {
   margin: 0 0 var(--space-md);
 }
 
-main form label {
+main form label:not(.calendar-range-preference) {
   display: block;
   margin-bottom: var(--space-sm);
 }
 
-main form input:not([type="checkbox"]):not([type="radio"]),
+main form input:not([type="checkbox"]):not([type="radio"]):not(.calendar-range-preference-input),
 main form select,
 main form textarea {
   width: 100%;
@@ -48,7 +48,7 @@ main form textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-main form input:focus,
+main form input:not(.calendar-range-preference-input):focus,
 main form select:focus,
 main form textarea:focus {
   outline: none;

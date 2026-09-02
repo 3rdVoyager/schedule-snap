@@ -135,12 +135,12 @@
 }
 
 /* Fields inside cards outside a <form> (e.g. link copy rows on dashboard) */
-main .card-normal label {
+main .card-normal label:not(.calendar-range-preference) {
   display: block;
   margin-bottom: var(--space-sm);
 }
 
-main .card-normal input:not([type="checkbox"]):not([type="radio"]),
+main .card-normal input:not([type="checkbox"]):not([type="radio"]):not(.calendar-range-preference-input),
 main .card-normal select,
 main .card-normal textarea {
   width: 100%;
@@ -152,7 +152,7 @@ main .card-normal textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-main .card-normal input:focus,
+main .card-normal input:not(.calendar-range-preference-input):focus,
 main .card-normal select:focus,
 main .card-normal textarea:focus {
   outline: none;

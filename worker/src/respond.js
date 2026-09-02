@@ -7,6 +7,7 @@ import {
   parseStoredSettings,
   publicSettings,
   validateAvailability,
+  validatePreferences,
 } from "./lib.js";
 
 export async function getEventByCode(env, eventCode) {
@@ -86,6 +87,11 @@ export async function updateResponse(request, env, editToken) {
     return json({ error: validated.error }, 400);
   }
 
+  const preferenceResult = validatePreferences(body.preferences, validated.availability);
+  if (preferenceResult.error) {
+    return json({ error: preferenceResult.error }, 400);
+  }
+
   const schedulingWindows = stored.schedulingWindows ?? [];
   for (let i = 0; i < validated.availability.length; i++) {
     const range = validated.availability[i];
@@ -99,10 +105,20 @@ export async function updateResponse(request, env, editToken) {
   }
 
   const now = new Date().toISOString();
+  const preferencesJson =
+    preferenceResult.preferences === null
+      ? null
+      : JSON.stringify(preferenceResult.preferences);
   await env.DB.prepare(
-    "UPDATE responses SET display_name = ?, availability = ?, updated_at = ? WHERE id = ?",
+    "UPDATE responses SET display_name = ?, availability = ?, preferences = ?, updated_at = ? WHERE id = ?",
   )
-    .bind(displayName, JSON.stringify(validated.availability), now, row.id)
+    .bind(
+      displayName,
+      JSON.stringify(validated.availability),
+      preferencesJson,
+      now,
+      row.id,
+    )
     .run();
 
   return json({ id: row.id, editToken }, 200);
@@ -142,6 +158,11 @@ export async function submitResponse(request, env, eventCode) {
     return json({ error: validated.error }, 400);
   }
 
+  const preferenceResult = validatePreferences(body.preferences, validated.availability);
+  if (preferenceResult.error) {
+    return json({ error: preferenceResult.error }, 400);
+  }
+
   const stored = parseStoredSettings(event.settings) ?? {};
   if (stored.acceptingResponses === false) {
     return json({ error: "This event is no longer accepting new responses" }, 403);
@@ -163,9 +184,13 @@ export async function submitResponse(request, env, eventCode) {
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
   const editToken = generateHexToken();
+  const preferencesJson =
+    preferenceResult.preferences === null
+      ? null
+      : JSON.stringify(preferenceResult.preferences);
 
   await env.DB.prepare(
-    "INSERT INTO responses (id, event_id, edit_token, display_name, availability, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO responses (id, event_id, edit_token, display_name, availability, preferences, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
   )
     .bind(
       id,
@@ -173,6 +198,7 @@ export async function submitResponse(request, env, eventCode) {
       editToken,
       displayName,
       JSON.stringify(validated.availability),
+      preferencesJson,
       now,
       now,
     )

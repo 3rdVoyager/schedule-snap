@@ -44,6 +44,7 @@ export function createResponseListController(elements) {
       timezone: eventContext.timezone,
       schedulingWindows: eventContext.schedulingWindows,
       initialRanges: response.availability ?? [],
+      initialPreferences: response.preferences ?? {},
     });
   }
 

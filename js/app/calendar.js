@@ -12,6 +12,11 @@ const SLOT_MINUTES = 15;
 const SLOT_HEIGHT_PX = 24;
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const FULL_DAY_SEGMENT = { startMinutes: 0, endMinutes: 24 * 60 };
+const DEFAULT_PREFERENCE = 3;
+
+function rangeKey(range) {
+  return `${range.start}|${range.end}`;
+}
 
 function snapMinute(minute, mode) {
   if (mode === "ceil") {
@@ -22,15 +27,17 @@ function snapMinute(minute, mode) {
 
 /**
  * @param {HTMLElement} container
- * @param {{ mode?: "availability" | "scheduling" | "view", timezone: string, schedulingWindows?: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], onChange?: () => void }} options
+ * @param {{ mode?: "availability" | "scheduling" | "view", timezone: string, schedulingWindows?: {start:string,end:string}[], initialRanges?: {start:string,end:string}[], initialPreferences?: Record<string, number>, onChange?: () => void }} options
  */
 export function createCalendar(container, options) {
   const mode = options.mode ?? "availability";
   const isReadOnly = mode === "view";
+  const showPreferences = mode === "availability";
   let timezone = options.timezone;
   const schedulingWindows = options.schedulingWindows ?? [];
   const { onChange } = options;
   let ranges = [...(options.initialRanges ?? [])];
+  let preferences = { ...(options.initialPreferences ?? {}) };
   let viewYear;
   let viewMonth;
   let selectedDay = null;
@@ -51,6 +58,7 @@ export function createCalendar(container, options) {
 
   initViewMonth();
   autoSelectFirstDay();
+  syncPreferences();
   render();
 
   const onDocPointerUp = () => endDrag();
@@ -190,6 +198,20 @@ export function createCalendar(container, options) {
     return merged;
   }
 
+  function syncPreferences() {
+    for (const range of ranges) {
+      const key = rangeKey(range);
+      if (preferences[key] === undefined) {
+        preferences[key] = DEFAULT_PREFERENCE;
+      }
+    }
+    for (const key of Object.keys(preferences)) {
+      if (!ranges.some((range) => rangeKey(range) === key)) {
+        delete preferences[key];
+      }
+    }
+  }
+
   function addRangeOnDay(dayKeyStr, lo, endMinute) {
     const otherDays = ranges.filter(
       (r) => dateKeyInZone(r.start, timezone) !== dayKeyStr,
@@ -207,10 +229,12 @@ export function createCalendar(container, options) {
     ranges = [...otherDays, ...dayRanges].sort(
       (a, b) => new Date(a.start) - new Date(b.start),
     );
+    syncPreferences();
   }
 
   function removeRange(range) {
     ranges = ranges.filter((r) => r !== range);
+    syncPreferences();
     notifyChange();
     render();
   }
@@ -533,15 +557,54 @@ export function createCalendar(container, options) {
       li.className = "calendar-range-item text-sub";
 
       const text = document.createElement("span");
+      text.className = "calendar-range-item-time";
       text.textContent = `${formatInZone(range.start, timezone)} – ${formatInZone(range.end, timezone)}`;
       li.appendChild(text);
+
+      const key = rangeKey(range);
+      if (showPreferences) {
+        const prefLabel = document.createElement("label");
+        prefLabel.className = "calendar-range-preference text-body-sm";
+
+        const prefText = document.createElement("span");
+        prefText.className = "calendar-range-preference-label";
+        prefText.textContent = "Preference (1-5)";
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.className = "calendar-range-preference-input";
+        input.min = "1";
+        input.max = "5";
+        input.step = "1";
+        input.inputMode = "numeric";
+        input.value = String(preferences[key] ?? DEFAULT_PREFERENCE);
+        input.setAttribute("aria-label", "Preference for this time range");
+        input.addEventListener("change", () => {
+          const value = Number(input.value);
+          const preference = Math.min(
+            5,
+            Math.max(1, Math.round(value) || DEFAULT_PREFERENCE),
+          );
+          input.value = String(preference);
+          preferences[key] = preference;
+          notifyChange();
+        });
+
+        prefLabel.append(prefText, input);
+        li.appendChild(prefLabel);
+      } else if (isReadOnly && preferences[key] !== undefined) {
+        const pref = document.createElement("span");
+        pref.className = "calendar-range-preference-readout text-sub";
+        pref.textContent = `Preference ${preferences[key]}`;
+        li.appendChild(pref);
+      }
 
       if (!isReadOnly) {
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
         removeBtn.className = "calendar-range-remove";
         removeBtn.setAttribute("aria-label", "Remove this time range");
-        removeBtn.textContent = "×";
+        removeBtn.textContent = "";
         removeBtn.addEventListener("click", () => removeRange(range));
         li.appendChild(removeBtn);
       }
@@ -606,8 +669,13 @@ export function createCalendar(container, options) {
     getRanges() {
       return ranges.map((r) => ({ start: r.start, end: r.end }));
     },
+    getPreferences() {
+      syncPreferences();
+      return { ...preferences };
+    },
     setRanges(next) {
       ranges = next.map((r) => ({ ...r }));
+      syncPreferences();
       if (ranges.length > 0) {
         selectedDay = dateKeyInZone(ranges[0].start, timezone);
         const [y, m] = selectedDay.split("-").map(Number);
