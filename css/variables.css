@@ -1,7 +1,7 @@
 :root {
+    /* Brand */
     --brand-color-green: #14B8A6;
     --brand-color-yellow: #FACC15;
-    --brand-color-white: #E3E3E3;
 
     --primary-color: var(--brand-color-green);
     --primary-color-hover: #0F9989;
@@ -10,51 +10,119 @@
     --secondary-color-hover: #dfb40a;
     --secondary-color-light: #fefce8;
     --text-on-accent: #1a1a1a;
-    --tertiary-color: var(--brand-color-white);
-    --tertiary-color-hover: #afafaf;
 
-    --font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    /* Typography */
+    --font-family: "Inter", system-ui, sans-serif;
     --font-family-mono: ui-monospace, "Cascadia Code", "Consolas", monospace;
 
     --text-size-xs: 11px;
     --text-size-caption: 12px;
     --text-size-small: 14px;
-    --text-size-medium: 16px;
-    --text-size-large: 18px;
-    --text-size-display: 1.75rem;
-    --text-size-brand: 1.5rem;
+    --text-size-medium: 1rem;
+    --text-size-large: 1.2rem;
+    --text-size-display: clamp(2rem, 4vw, 3rem);
+    --text-size-brand: 1.75rem;
+    --text-size-lead: 1.12rem;
+
+    --heading-size-h1: var(--text-size-display);
+    --heading-size-h2: clamp(1.5rem, 2.5vw, 1.85rem);
+    --heading-size-h3: 1.2rem;
+    --heading-size-h4: 1.05rem;
 
     --line-height-tight: 1.2;
     --line-height-snug: 1.25;
-    --line-height-normal: 1.5;
+    --line-height-normal: 1.6;
+    --line-height-body: 1.65;
+    --line-height-lead: 1.65;
+    --letter-spacing-wide: 0.08em;
 
-    /* Site */
-    --site-bg-color: #FAFAFA;
-    --header-bg-color: #ecfffb;
-    --footer-bg-color: #ecfffb;
-    --border-color: var(--primary-color-hover);
+    --text-normal: var(--text-size-medium);
+    --text-small: var(--text-size-small);
+    --body-font: var(--font-family);
+    --heading-font: var(--font-family);
 
-    --text-color-dark: #000000;
+    /* Text colors */
+    --text-color-dark: #1a1a1a;
     --text-color-light: #595959;
+    --text-muted: #737373;
+    --text-color-muted: var(--text-color-light);
 
+    /* Surfaces */
+    --surface-page: #fafafa;
+    --surface-card: #ffffff;
+    --card-bg: var(--surface-card);
+    --section-bg-color: transparent;
+    --section-accent: var(--primary-color);
+
+    /* Borders */
+    --border-subtle: color-mix(in srgb, var(--primary-color) 35%, #b8d4d0);
+    --card-border: color-mix(in srgb, var(--primary-color) 45%, #a8ccc8);
+    --border-color: var(--primary-color);
+    --light-border-color: var(--border-subtle);
+    --dark-border-color: var(--primary-color-hover);
+    --border-width-thin: 2px;
+    --border-width-thick: 3px;
+
+    /* Buttons */
     --button-border-radius: 10px;
-    --button-text-color: #FFFFFF;
+    --button-radius: var(--button-border-radius);
+    --button-border-width: 2px;
+    --button-text-color: #ffffff;
+    --outline-button-text-color: var(--text-color-dark);
+    --secondary-button-color: transparent;
+    --secondary-button-border-color: var(--secondary-color-hover);
+    --secondary-button-color-hover: color-mix(in srgb, var(--secondary-color) 28%, transparent);
+    --tertiary-button-color: transparent;
+    --tertiary-button-border-color: var(--primary-color-hover);
+    --tertiary-button-color-hover: color-mix(in srgb, var(--primary-color) 12%, white);
 
+    /* Chrome (header/footer — shared by app + site) */
+    --header-bg-color: color-mix(in srgb, var(--primary-color-light) 72%, white);
+    --footer-bg-color: color-mix(in srgb, var(--primary-color-light) 55%, white);
+    --footer-text: var(--text-color-dark);
+    --footer-text-muted: var(--text-color-light);
     --nav-padding: 20px;
 
-    /* App */
+    /* Site layout tokens (used by css/site/*) */
+    --site-bg-color: #f8fafa;
+    --site-line-color: color-mix(in srgb, var(--primary-color) 42%, #b8d4d0);
+    --site-max-width: 100vw;
+
+    /* Spacing */
+    --space-xxs: 2px;
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;
     --space-lg: 24px;
     --space-xl: 32px;
 
-    --text-muted: #737373;
-    --color-error: #b42318;
+    --content-max-width: 42rem;
+    --content-max-width-wide: 56rem;
+    --content-gap: var(--space-sm);
+    --page-padding-x: 5vw;
+    --page-padding-y: var(--space-md);
+    --section-padding-y: var(--space-xl);
+    --section-padding-x: var(--space-lg);
+    --section-content-padding: var(--space-md);
+    --section-grid-gap: var(--space-sm);
 
-    --surface-page: #fafafa;
-    --surface-card: #ffffff;
-    --border-subtle: #e2e8e8;
+    /* Misc */
+    --color-error: #b42318;
     --radius-card: 12px;
     --focus-ring: 0 0 0 3px rgba(20, 184, 166, 0.25);
+    --transition-fast: 0.2s ease-in-out;
+    --shadow-sm: 0 1px 3px rgba(20, 184, 166, 0.08);
+    --shadow-md: 0 4px 12px rgba(20, 184, 166, 0.1);
+
+    --hero-min-height: clamp(10rem, 22vh, 14rem);
+    --hero-content-max-width: 52rem;
+    --hero-overlay: rgba(15, 153, 137, 0.72);
+    --hero-bg-image: linear-gradient(135deg, var(--primary-color-light), #ffffff);
+
+    --card-min-sm: 14rem;
+    --card-max-sm: 18rem;
+    --card-min-md: 18rem;
+    --card-max-md: 24rem;
+    --card-min-lg: 24rem;
+    --card-max-lg: 32rem;
 }

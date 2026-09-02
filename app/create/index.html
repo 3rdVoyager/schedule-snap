@@ -22,19 +22,13 @@
     />
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
     <header></header>
     <main class="app-main">
       <form id="create-event-form" class="card-stack">
         <fieldset class="card card-normal section">
-          <legend class="text-heading">Event details</legend>
+          <legend>Event details</legend>
           <p class="text-sub">Provide a title and description for the event.</p>
           <div class="form-field">
             <label class="text-body-sm text-semibold" for="title">Title</label>
@@ -46,7 +40,7 @@
           </div>
         </fieldset>
         <fieldset class="card card-normal section">
-          <legend class="text-heading">How long is the event?</legend>
+          <legend>How long is the event?</legend>
           <p class="text-sub">This is the duration of the event.</p>
           <div class="form-field">
             <label class="text-body-sm text-semibold" for="duration">Duration</label>
@@ -62,7 +56,7 @@
           </div>
         </fieldset>
         <fieldset class="card card-normal section">
-          <legend class="text-heading">What timezone is the event in?</legend>
+          <legend>What timezone is the event in?</legend>
           <p class="text-sub">
             This is the timezone of the event. This is used to convert all
             responses to the event's timezone.
@@ -103,7 +97,7 @@
           </div>
         </fieldset>
         <fieldset class="card card-normal section">
-          <legend class="text-heading">When can participants schedule their availability?</legend>
+          <legend>When can participants schedule their availability?</legend>
           <p class="text-sub">
             These are the time windows in which respondents can add their
             availability. Think of this as the windows of possible times the
@@ -117,11 +111,11 @@
       <!-- Hidden Success Message -->
       <div id="create-success" class="card-stack" hidden>
         <section class="card card-normal section">
-          <h2 class="text-heading">Event created</h2>
+          <h2>Event created</h2>
         </section>
 
         <section class="card card-normal section">
-          <h3 class="text-heading">Share with participants</h3>
+          <h3>Share with participants</h3>
           <p class="text-sub">Event code: <strong id="event-code" class="text-code"></strong></p>
           <label class="text-body-sm text-semibold" for="respond-link">Participant link</label>
           <input type="text" class="text-input" id="respond-link" readonly />
@@ -129,7 +123,7 @@
         </section>
 
         <section class="card card-normal section">
-          <h3 class="text-heading">Save your organizer access</h3>
+          <h3>Save your organizer access</h3>
           <p class="text-sub">
             Anyone with this secret can view responses and edit the event. Save
             it somewhere safe — we only show it once.

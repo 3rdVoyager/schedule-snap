@@ -7,17 +7,17 @@
 
 .card-hero {
   background-color: var(--secondary-color-light);
-  border: 2px solid var(--secondary-color);
+  border: var(--border-width-thin) solid var(--secondary-color-hover);
 }
 
 .card-bold {
   background: var(--primary-color-light);
-  border: 2px solid var(--primary-color);
+  border: var(--border-width-thin) solid var(--primary-color);
 }
 
 .card-normal {
   background: var(--surface-card);
-  border: 2px solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--card-border);
 }
 
 .card-hero.card-header {
@@ -76,7 +76,7 @@
 
 .card-normal > .app-list,
 .card-normal > .app-list--bordered {
-  border: 2px solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--card-border);
   border-radius: var(--button-border-radius);
   background: var(--surface-card);
   overflow: hidden;

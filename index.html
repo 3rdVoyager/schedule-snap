@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ScheduleSnap</title>
+    <meta
+      name="description"
+      content="ScheduleSnap — find the best time for your group to meet with scheduling windows, custom availability, and automatic recommendations."
+    />
+    <title>ScheduleSnap — Find the best time to meet</title>
     <link rel="stylesheet" href="/css/site/main.css" />
     <script src="/js/site/nav.js" defer></script>
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
@@ -21,20 +25,154 @@
     />
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     />
   </head>
-  <body>
+  <body class="page-site">
     <header></header>
-    <main>
-      <div class="brand-container">
-        <img class="brand-logo" src="/assets/logos/logo.png" alt="ScheduleSnap">
-        <div class="text-brand"><span class="text-primary">Schedule</span><span class="text-accent">Snap</span></div>
-      </div>
+    <main class="page-main">
+      <section class="hero hero--home" id="hero">
+        <div class="hero-content">
+          <h1>
+            <span class="text-primary">Schedule</span><span class="text-accent">Snap</span>
+          </h1>
+          <p class="lead">
+            Find the best possible time for your group to meet — with scheduling
+            windows, custom availability, and ranked recommendations in seconds.
+          </p>
+          <div class="site-buttons">
+            <a href="/app/create/" class="button button-primary button-large"
+              >Create an event</a
+            >
+            <a href="/how-it-works/" class="button button-secondary button-large"
+              >How it works</a
+            >
+          </div>
+        </div>
+        <figure class="screenshot-frame hero-shot">
+          <div class="screenshot-placeholder" aria-hidden="true">
+            Screenshot — Manage view with recommendations
+          </div>
+          <figcaption class="visually-hidden">
+            Organizer dashboard showing ranked time recommendations.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="content-section" id="problem">
+        <h2>The problem</h2>
+        <p class="section-intro">
+          Most scheduling tools ask the organizer to guess time slots up front —
+          then everyone compares answers by hand.
+        </p>
+        <ul class="problem-list">
+          <li>
+            <span class="material-symbols-outlined">event_busy</span>
+            <div>
+              <strong>Fixed slots miss real availability</strong>
+              <p>
+                When you pre-pick times, respondents can only say yes or no to
+                your guesses — not when they can actually meet.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="material-symbols-outlined">table</span>
+            <div>
+              <strong>Spreadsheets don't rank tradeoffs</strong>
+              <p>
+                A grid shows overlap, but not which time balances attendance,
+                preferences, and must-have attendees.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="material-symbols-outlined">group</span>
+            <div>
+              <strong>Group scheduling shouldn't need accounts</strong>
+              <p>
+                People just want a link to respond — not another login before
+                they can say when they're free.
+              </p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="content-section" id="why">
+        <div class="split-layout">
+          <div class="split-content">
+            <h2>Why ScheduleSnap</h2>
+            <p>
+              ScheduleSnap flips the usual flow: you set broad
+              <strong>scheduling windows</strong>, respondents mark their own
+              availability inside them, and recommendations appear automatically.
+            </p>
+            <p>
+              Rank preferences from 1–5, flag critical attendees, and pick from
+              balanced suggestions instead of manually scanning every response.
+            </p>
+            <div class="site-buttons">
+              <a href="/features/" class="button button-secondary button-large"
+                >See all features</a
+              >
+            </div>
+          </div>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Respond calendar with availability ranges
+            </div>
+            <figcaption class="visually-hidden">
+              Respond view with calendar availability and preference ranking.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="content-section" id="highlights">
+        <h2>See it in the product</h2>
+        <p class="section-intro">
+          Create, respond, and decide — one link-based flow for every group
+          meeting.
+        </p>
+        <div class="screenshot-row">
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Create event &amp; windows
+            </div>
+            <figcaption>Create — scheduling windows</figcaption>
+          </figure>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Respond with preferences
+            </div>
+            <figcaption>Respond — availability &amp; ranking</figcaption>
+          </figure>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Recommendations &amp; results
+            </div>
+            <figcaption>Decide — ranked recommendations</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="content-section cta-section" id="cta">
+        <h2>Ready to stop guessing meeting times?</h2>
+        <p class="section-intro">
+          Create an event in minutes — no accounts, free, and open source.
+        </p>
+        <div class="site-buttons">
+          <a href="/app/create/" class="button button-primary button-large"
+            >Create an event</a
+          >
+          <a href="/features/#compare" class="button button-secondary button-large"
+            >Compare alternatives</a
+          >
+        </div>
+      </section>
     </main>
     <footer></footer>
   </body>

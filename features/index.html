@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ScheduleSnap</title>
+    <title>Features | ScheduleSnap</title>
     <link rel="stylesheet" href="/css/site/main.css" />
     <script src="/js/site/nav.js" defer></script>
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
@@ -21,20 +21,176 @@
     />
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     />
   </head>
-  <body>
+  <body class="page-site">
     <header></header>
-    <main>
-      <div class="brand-container">
-        <img class="brand-logo" src="/assets/logos/logo.png" alt="ScheduleSnap">
-        <div class="text-brand"><span class="text-primary">Schedule</span><span class="text-accent">Snap</span></div>
-      </div>
+    <main class="page-main">
+      <section class="hero hero--page">
+        <div class="hero-content">
+          <h1>Features</h1>
+          <p class="lead">
+            Form-based response collection, flexible availability, and automatic
+            recommendations — without the busywork.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <h2>What you get</h2>
+        <div class="prose">
+          <ul class="layout-grid auto cols-4 cards-sm type-card">
+            <li>
+              <h3 class="card-label">Flexible availability</h3>
+              <p class="card-value">
+                Calendar UI plus manual ranges for long windows
+              </p>
+            </li>
+            <li>
+              <h3 class="card-label">Preference ranking</h3>
+              <p class="card-value">
+                Rate times 1–5, not just available or not
+              </p>
+            </li>
+            <li>
+              <h3 class="card-label">Critical attendees</h3>
+              <p class="card-value">
+                Require key people in every recommended slot
+              </p>
+            </li>
+            <li>
+              <h3 class="card-label">No accounts</h3>
+              <p class="card-value">
+                Share links to respond, manage, and view — free and open source
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="content-section" id="compare">
+        <h2>ScheduleSnap vs alternatives</h2>
+        <div class="prose">
+          <p>
+            How ScheduleSnap compares to popular scheduling polls, grids, and
+            booking tools groups often reach for instead.
+          </p>
+          <div class="table-scroll">
+            <table class="card-table card-table--compare">
+              <thead>
+                <tr>
+                  <th class="card-table__corner" scope="col">Feature</th>
+                  <th scope="col">ScheduleSnap</th>
+                  <th scope="col">When2meet</th>
+                  <th scope="col">Doodle</th>
+                  <th scope="col">Calendly</th>
+                  <th scope="col">Rallly</th>
+                  <th scope="col">Google Forms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Automatic time recommendations</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <th scope="row">Scheduling windows (not fixed slots only)</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Partial</td>
+                  <td>No</td>
+                  <td>Partial</td>
+                  <td>No</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <th scope="row">Respondents define their own availability</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Grid only</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Manual</td>
+                </tr>
+                <tr>
+                  <th scope="row">Preference ranking (beyond yes/no)</th>
+                  <td class="is-highlight">Yes (1–5)</td>
+                  <td>No</td>
+                  <td>Limited</td>
+                  <td>No</td>
+                  <td>Vote only</td>
+                  <td>Manual</td>
+                </tr>
+                <tr>
+                  <th scope="row">Require critical attendees in results</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <th scope="row">No account to respond</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Yes</td>
+                  <td>Yes</td>
+                  <td>Usually</td>
+                  <td>Yes</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <th scope="row">No account to organize</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Yes</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Self-host option</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <th scope="row">Built-in group results view</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Yes</td>
+                  <td>Yes</td>
+                  <td>Limited</td>
+                  <td>Yes</td>
+                  <td>Manual</td>
+                </tr>
+                <tr>
+                  <th scope="row">Free to use</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>Yes</td>
+                  <td>Limited plan</td>
+                  <td>Limited plan</td>
+                  <td>Yes</td>
+                  <td>Yes</td>
+                </tr>
+                <tr>
+                  <th scope="row">Open source</th>
+                  <td class="is-highlight">Yes</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Yes</td>
+                  <td>No</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sub">
+            Comparisons reflect typical product behavior; specific plans and
+            features may vary.
+          </p>
+        </div>
+      </section>
     </main>
     <footer></footer>
   </body>

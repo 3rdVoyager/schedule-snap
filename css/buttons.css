@@ -1,7 +1,10 @@
 .button {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
     text-decoration: none;
-    border: 2px solid transparent;
+    border: var(--button-border-width) solid transparent;
     cursor: pointer;
     color: var(--button-text-color);
     padding: 10px 20px;
@@ -9,7 +12,7 @@
     font-size: var(--text-size-medium);
     font-weight: 600;
     line-height: var(--line-height-snug);
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 a.button,
@@ -22,9 +25,22 @@ button.button {
     -webkit-appearance: none;
 }
 
+.button:hover {
+    transform: scale(1.02) rotate(-1deg);
+}
+
+.button:active {
+    transform: scale(0.97);
+}
+
 .button-small {
-    padding: 6px 14px;
+    padding: 0.5rem 0.75rem;
     font-size: var(--text-size-small);
+}
+
+.button-large {
+    padding: 0.7rem 1.15rem;
+    font-size: 1rem;
 }
 
 .button-primary {
@@ -38,7 +54,7 @@ button.button {
 }
 
 .button-primary-outline {
-    background-color: white;
+    background-color: var(--surface-card);
     border-color: var(--primary-color);
     color: var(--primary-color);
 }
@@ -49,18 +65,32 @@ button.button {
 }
 
 .button-secondary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
+    background-color: var(--secondary-button-color);
+    border-color: var(--secondary-button-border-color);
+    color: var(--outline-button-text-color);
 }
 
 .button-secondary:hover {
-    background-color: var(--secondary-color-hover);
-    border-color: var(--secondary-color-hover);
+    background-color: var(--secondary-button-color-hover);
+    border-color: var(--secondary-button-border-color);
+    color: var(--outline-button-text-color);
+}
+
+.button-tertiary {
+    background-color: var(--tertiary-button-color);
+    border-color: var(--tertiary-button-border-color);
+    color: var(--outline-button-text-color);
+}
+
+.button-tertiary:hover {
+    background-color: var(--tertiary-button-color-hover);
+    border-color: var(--tertiary-button-border-color);
+    color: var(--outline-button-text-color);
 }
 
 .button-secondary-outline {
-    background-color: white;
-    border-color: var(--secondary-color);
+    background-color: var(--surface-card);
+    border-color: var(--secondary-color-hover);
     color: var(--secondary-color-hover);
 }
 

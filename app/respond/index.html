@@ -14,19 +14,13 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/logos/favicon-16x16.png" />
   <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
   <link rel="manifest" href="/assets/logos/site.webmanifest" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
 </head>
 <body>
   <header></header>
   <main class="app-main">
     <article id="event-view" class="page-header card card-hero" hidden>
-      <h1 class="text-title" id="event-title"></h1>
-      <p class="text-body text-muted" id="event-description" hidden></p>
+      <h1 id="event-title"></h1>
+      <p class="text-muted" id="event-description" hidden></p>
       <p class="text-sub" id="event-meta"></p>
       <ul class="page-header-windows" id="event-windows"></ul>
     </article>
@@ -38,7 +32,7 @@
 
     <form id="response-form" class="card-stack" hidden>
       <fieldset class="card card-normal section">
-        <legend class="text-heading">Your details</legend>
+        <legend>Your details</legend>
         <div class="form-field">
           <label class="text-body-sm text-semibold" for="display-name-input">Display name</label>
           <input
@@ -52,7 +46,7 @@
       </fieldset>
 
       <fieldset class="card card-normal section">
-        <legend class="text-heading">When are you available?</legend>
+        <legend>When are you available?</legend>
         <p class="text-sub">Select days and drag to mark your available times.</p>
         <div id="availability-calendar"></div>
       </fieldset>
@@ -67,7 +61,7 @@
     </form>
 
     <div id="respond-success" class="card card-normal section" hidden>
-      <h2 class="text-heading">Thanks, your response was submitted.</h2>
+      <h2>Thanks, your response was submitted.</h2>
       <p class="text-sub">Save this link to edit your response later.</p>
       <section id="edit-link-section">
         <p class="text-sub">Edit token: <strong id="edit-token"></strong></p>

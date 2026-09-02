@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ScheduleSnap</title>
+    <title>How It Works | ScheduleSnap</title>
     <link rel="stylesheet" href="/css/site/main.css" />
     <script src="/js/site/nav.js" defer></script>
     <link rel="icon" href="/assets/logos/favicon.ico" sizes="any" />
@@ -21,20 +21,117 @@
     />
     <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/logos/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     />
   </head>
-  <body>
+  <body class="page-site">
     <header></header>
-    <main>
-      <div class="brand-container">
-        <img class="brand-logo" src="/assets/logos/logo.png" alt="ScheduleSnap">
-        <div class="text-brand"><span class="text-primary">Schedule</span><span class="text-accent">Snap</span></div>
-      </div>
+    <main class="page-main">
+      <section class="hero hero--page">
+        <div class="hero-content">
+          <h1>How It Works</h1>
+          <p class="lead">
+            From scheduling windows to ranked recommendations in three steps.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <div class="split-layout">
+          <div class="split-content">
+            <h2>Windows, not slots</h2>
+            <p>
+              Instead of asking the organizer to pre-define every time slot,
+              ScheduleSnap uses <strong>scheduling windows</strong> — the periods
+              when the event <em>could</em> happen. Respondents add their own
+              availability inside those windows using a fully customizable
+              calendar interface.
+            </p>
+            <p>
+              You get an accurate picture of when people can actually meet, not
+              just yes/no answers to times you guessed ahead of time.
+            </p>
+          </div>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Scheduling windows on create
+            </div>
+            <figcaption class="visually-hidden">
+              Create view showing broad scheduling windows.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <h2>The flow</h2>
+        <p class="section-intro">
+          Three links — create, respond, and manage — cover the whole group
+          scheduling loop.
+        </p>
+        <ol class="layout-grid cols-3 cards-md type-card">
+          <li>
+            <h3 class="card-label">Create</h3>
+            <p class="card-value">
+              Set scheduling windows, duration, and share the participant link
+            </p>
+          </li>
+          <li>
+            <h3 class="card-label">Respond</h3>
+            <p class="card-value">
+              Each person marks availability and ranks how they feel about each
+              time
+            </p>
+          </li>
+          <li>
+            <h3 class="card-label">Decide</h3>
+            <p class="card-value">
+              Review automatic recommendations and pick the best fit
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="content-section">
+        <h2>See it in the product</h2>
+        <div class="screenshot-row">
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Create event
+            </div>
+            <figcaption>Create — windows &amp; share links</figcaption>
+          </figure>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Respond calendar
+            </div>
+            <figcaption>Respond — mark availability</figcaption>
+          </figure>
+          <figure class="screenshot-frame">
+            <div class="screenshot-placeholder" aria-hidden="true">
+              Screenshot — Recommendations
+            </div>
+            <figcaption>Decide — ranked times</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="content-section cta-section">
+        <h2>Try it with your group</h2>
+        <p class="section-intro">
+          No accounts to respond — share a link and start collecting availability.
+        </p>
+        <div class="site-buttons">
+          <a href="/app/create/" class="button button-primary button-large"
+            >Create an event</a
+          >
+          <a href="/features/" class="button button-secondary button-large"
+            >View features</a
+          >
+        </div>
+      </section>
     </main>
     <footer></footer>
   </body>

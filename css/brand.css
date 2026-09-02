@@ -1,11 +1,20 @@
-.brand-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-}
-
-.brand-logo {
-    width: 36px;
-    height: 36px;
-}
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+}
+
+.text-brand .text-primary {
+  color: var(--primary-color);
+}
+
+.text-brand .text-accent {
+  color: var(--secondary-color);
+}

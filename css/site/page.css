@@ -1,0 +1,51 @@
+/* Site page shell — layout and marketing background only */
+
+body.page-site {
+  min-height: 100vh;
+  background-color: var(--site-bg-color);
+  background-image:
+    radial-gradient(ellipse 75% 55% at 15% 0%, color-mix(in srgb, var(--primary-color) 36%, transparent), transparent 62%),
+    radial-gradient(ellipse 60% 50% at 90% 8%, color-mix(in srgb, var(--secondary-color) 28%, transparent), transparent 58%),
+    radial-gradient(ellipse 65% 45% at 70% 55%, color-mix(in srgb, var(--primary-color) 24%, transparent), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 10% 85%, color-mix(in srgb, var(--secondary-color) 20%, transparent), transparent 55%);
+  background-attachment: fixed;
+}
+
+body.page-site a.brand-container {
+  color: inherit;
+}
+
+.page-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  max-width: var(--site-max-width);
+  min-height: calc(100vh - 100px);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2rem);
+  padding-block: 0 clamp(2rem, 5vw, 3rem);
+  background: transparent;
+  color: inherit;
+}
+
+.page-main > .hero,
+.page-main > .content-section,
+.page-main > .layout-grid.snap {
+  border-bottom: var(--border-width-thin) solid var(--site-line-color);
+}
+
+.page-main > .content-section,
+.page-main > .layout-grid.snap {
+  padding-inline: 0;
+  padding-top: clamp(3rem, 8vw, 4.5rem);
+  padding-bottom: clamp(3rem, 8vw, 4.5rem);
+}
+
+.page-main > :last-child {
+  border-bottom: none;
+}
+
+.layout-grid.snap {
+  background-color: transparent;
+}

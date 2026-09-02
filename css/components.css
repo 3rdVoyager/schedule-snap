@@ -1,0 +1,348 @@
+/* ── Content sections ──────────────────────────────────── */
+.content-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--section-content-padding);
+  width: 100%;
+  text-align: left;
+  background-color: var(--section-bg-color);
+  font-size: var(--text-normal);
+  color: inherit;
+  font-family: var(--body-font);
+}
+
+.content-section > h2 {
+  width: 100%;
+  margin-inline: auto;
+  padding-bottom: var(--space-xs);
+  text-align: left;
+  color: var(--text-color-dark);
+}
+
+.content-section > h3 {
+  width: 100%;
+  margin-inline: auto;
+  padding-bottom: var(--space-xs);
+  text-align: left;
+  color: var(--text-color-dark);
+}
+
+.content-section > .prose,
+.content-section > .content-media,
+.content-section > .layout-grid,
+.content-section > .table-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+  align-self: stretch;
+}
+
+.section-intro {
+  margin: 0;
+  max-width: 40rem;
+}
+
+.layout-grid.snap .content-section {
+  padding: 0;
+  margin: 0;
+  border-bottom: none;
+  background-color: transparent;
+}
+
+.content-section > .layout-grid.snap {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+/* ── Prose (paragraph / article content) ───────────────── */
+.prose {
+  width: 100%;
+  max-width: var(--content-max-width-wide);
+  margin-inline: auto;
+  text-align: left;
+}
+
+.prose p {
+  font-size: var(--text-normal);
+  color: var(--text-color-muted);
+}
+
+.prose > * + * {
+  margin-top: var(--space-md);
+}
+
+.prose ul,
+.prose ol,
+.prose li {
+  font-size: var(--text-normal);
+}
+
+.prose ul,
+.prose ol {
+  display: inline-block;
+  padding-left: var(--space-lg);
+  text-align: left;
+  line-height: var(--line-height-body);
+}
+
+.prose ul > li + li,
+.prose ol > li + li {
+  margin-top: var(--space-xs);
+}
+
+.prose ul.layout-grid,
+.prose ol.layout-grid {
+  display: grid;
+  padding-left: 0;
+  text-align: left;
+  line-height: inherit;
+}
+
+.prose .layout-grid > li + li {
+  margin-top: 0;
+}
+
+.prose strong {
+  color: var(--section-accent);
+  font-weight: 700;
+}
+
+/* ── Content media (images, figures) ───────────────────── */
+.content-media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.content-media img {
+  width: min(100%, 28rem);
+  height: auto;
+}
+
+.content-media figcaption {
+  margin-top: var(--space-xs);
+  font-size: var(--text-small);
+  color: var(--text-color-muted);
+}
+
+/* ── Card typography (used inside type-card cells) ─────── */
+.card-label {
+  display: block;
+  font-size: var(--text-small);
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--section-accent);
+}
+
+.card-value {
+  display: block;
+  margin-top: var(--space-xxs);
+  font-size: var(--text-normal);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+}
+
+/* ── Layout grid ───────────────────────────────────────── */
+.layout-grid {
+  --card-min: var(--card-min-md);
+  --card-max: var(--card-max-md);
+  --cols-max: 999;
+  --track-min: min(
+    100%,
+    max(
+      var(--card-min),
+      calc((100% - (var(--cols-max) - 1) * var(--space-sm)) / var(--cols-max))
+    )
+  );
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--track-min), 1fr));
+  gap: var(--space-sm);
+  width: 100%;
+  margin-inline: auto;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.layout-grid.snap {
+  gap: var(--section-grid-gap);
+  align-items: start;
+  grid-template-columns: repeat(var(--cols-max), 1fr);
+}
+
+@media (max-width: 768px) {
+  .layout-grid.snap {
+    grid-template-columns: 1fr;
+  }
+}
+
+.layout-grid.auto {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 769px) {
+  .layout-grid.auto {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .layout-grid.auto:not(.cols-2):has(> :nth-child(3n):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .layout-grid.auto.cols-4:has(> :nth-child(4n):last-child) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.cards-sm {
+  --card-min: var(--card-min-sm);
+  --card-max: var(--card-max-sm);
+}
+
+.cards-md {
+  --card-min: var(--card-min-md);
+  --card-max: var(--card-max-md);
+}
+
+.cards-lg {
+  --card-min: var(--card-min-lg);
+  --card-max: var(--card-max-lg);
+}
+
+.cols-2 {
+  --cols-max: 2;
+}
+
+.cols-3 {
+  --cols-max: 3;
+}
+
+.cols-4 {
+  --cols-max: 4;
+}
+
+.layout-grid.type-card > :where(*) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--content-gap);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--card-bg);
+  border: var(--border-width-thin) solid var(--card-border);
+  border-radius: var(--button-radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.layout-grid.type-card > :where(*):has(a):hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.layout-grid.type-card > :where(*) > h3:not(.card-label) {
+  color: var(--section-accent);
+  line-height: var(--line-height-tight);
+}
+
+.layout-grid.type-card > :where(*) > p:not(.card-value) {
+  margin-top: var(--space-xxs);
+  font-size: var(--text-normal);
+  color: var(--text-color-muted);
+}
+
+.type-plain {
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ── Card table ────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.card-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: var(--space-sm);
+  text-align: center;
+}
+
+.card-table th {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-normal);
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--section-accent);
+  vertical-align: middle;
+}
+
+.card-table td {
+  padding: var(--space-sm);
+  background-color: var(--card-bg);
+  border: var(--border-width-thin) solid var(--card-border);
+  border-radius: var(--button-radius);
+  box-shadow: var(--shadow-sm);
+  vertical-align: middle;
+  color: var(--text-color-muted);
+}
+
+.card-table td.card-value {
+  margin-top: 0;
+  font-size: var(--text-small);
+  font-weight: 400;
+  line-height: var(--line-height-body);
+  color: var(--text-color-muted);
+  overflow-wrap: anywhere;
+}
+
+.card-table--compare {
+  min-width: 52rem;
+  text-align: center;
+}
+
+.card-table--compare th[scope="col"]:not(.card-table__corner) {
+  font-size: var(--text-size-caption);
+  line-height: var(--line-height-snug);
+  padding-inline: var(--space-xs);
+}
+
+.card-table--compare th[scope="row"] {
+  text-align: left;
+  font-size: var(--text-small);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-color-dark);
+  white-space: normal;
+}
+
+.card-table--compare th[scope="col"] {
+  font-size: var(--text-small);
+}
+
+.card-table--compare td.is-highlight {
+  font-weight: 600;
+  color: var(--section-accent);
+}
+
+.card-table--compare .card-table__corner {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+

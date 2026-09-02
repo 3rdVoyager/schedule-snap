@@ -42,7 +42,7 @@ main form textarea {
   width: 100%;
   max-width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border-subtle);
+  border: var(--button-border-width) solid var(--card-border);
   border-radius: var(--button-border-radius);
   background: var(--surface-card);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
