@@ -127,10 +127,11 @@ form.addEventListener("submit", async (event) => {
       timezone,
       durationMinutes: Number(document.querySelector("#duration").value),
       schedulingWindows,
-      responseWindow: { opensAt: null, closesAt: null },
       allowResponseEdits: document.querySelector("#allow-response-edits")
         .checked,
       resultsVisibleToParticipants: document.querySelector("#results-visible")
+        .checked,
+      acceptingResponses: document.querySelector("#accepting-responses")
         .checked,
     },
   };
@@ -208,6 +209,8 @@ function populateForm(data) {
     settings.allowResponseEdits;
   document.querySelector("#results-visible").checked =
     settings.resultsVisibleToParticipants;
+  document.querySelector("#accepting-responses").checked =
+    settings.acceptingResponses !== false;
 
   initSchedulingCalendar(settings.schedulingWindows ?? []);
 }

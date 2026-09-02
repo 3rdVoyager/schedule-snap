@@ -143,6 +143,10 @@ export async function submitResponse(request, env, eventCode) {
   }
 
   const stored = parseStoredSettings(event.settings) ?? {};
+  if (stored.acceptingResponses === false) {
+    return json({ error: "This event is no longer accepting new responses" }, 403);
+  }
+
   const schedulingWindows = stored.schedulingWindows ?? [];
 
   for (let i = 0; i < validated.availability.length; i++) {

@@ -13,6 +13,7 @@ import {
 
 const view = document.querySelector("#event-view");
 const responseForm = document.querySelector("#response-form");
+const responsesClosedEl = document.querySelector("#responses-closed");
 const successEl = document.querySelector("#respond-success");
 const unlinkSection = document.querySelector("#unlink-section");
 const calendarMount = document.querySelector("#availability-calendar");
@@ -190,6 +191,7 @@ async function loadForEdit(token) {
 async function loadEvent(eventCode) {
   view.hidden = true;
   responseForm.hidden = true;
+  responsesClosedEl.hidden = true;
 
   try {
     const response = await fetch(`${API_URL}/api/events/respond`, {
@@ -204,6 +206,10 @@ async function loadEvent(eventCode) {
     currentEventCode = eventCode;
     setParticipantEventCode(eventCode);
     renderEvent(data);
+    if (data.settings?.acceptingResponses === false) {
+      responsesClosedEl.hidden = false;
+      return;
+    }
     initCalendar(currentEvent);
     responseForm.hidden = false;
   } catch {

@@ -56,9 +56,9 @@ createEventForm.addEventListener("submit", async (event) => {
       timezone,
       durationMinutes,
       schedulingWindows,
-      responseWindow: { opensAt: null, closesAt: null },
       allowResponseEdits: true,
       resultsVisibleToParticipants: false,
+      acceptingResponses: true,
     },
   };
 

@@ -81,7 +81,6 @@ fetch("http://127.0.0.1:8787/api/events/create", {
         { start: "2026-09-03T18:00:00.000Z", end: "2026-09-03T21:00:00.000Z" },
         { start: "2026-09-05T14:00:00.000Z", end: "2026-09-05T20:00:00.000Z" },
       ],
-      responseWindow: { opensAt: null, closesAt: null },
       allowResponseEdits: true,
       resultsVisibleToParticipants: true,
     },

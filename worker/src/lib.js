@@ -83,39 +83,6 @@ export function validateSettings(rawSettings) {
     if (rangeError) return { error: rangeError };
   }
 
-  const responseWindow = rawSettings.responseWindow ?? {
-    opensAt: null,
-    closesAt: null,
-  };
-  if (typeof responseWindow !== "object") {
-    return { error: "settings.responseWindow must be an object" };
-  }
-
-  const opensAt =
-    responseWindow.opensAt === null
-      ? null
-      : parseUtcInstant(responseWindow.opensAt);
-  const closesAt =
-    responseWindow.closesAt === null
-      ? null
-      : parseUtcInstant(responseWindow.closesAt);
-
-  if (responseWindow.opensAt !== null && !opensAt) {
-    return {
-      error:
-        "settings.responseWindow.opensAt must be null or a UTC ISO timestamp",
-    };
-  }
-  if (responseWindow.closesAt !== null && !closesAt) {
-    return {
-      error:
-        "settings.responseWindow.closesAt must be null or a UTC ISO timestamp",
-    };
-  }
-  if (opensAt && closesAt && closesAt <= opensAt) {
-    return { error: "settings.responseWindow.closesAt must be after opensAt" };
-  }
-
   const allowResponseEdits =
     rawSettings.allowResponseEdits === undefined
       ? true
@@ -132,17 +99,22 @@ export function validateSettings(rawSettings) {
     return { error: "settings.resultsVisibleToParticipants must be a boolean" };
   }
 
+  const acceptingResponses =
+    rawSettings.acceptingResponses === undefined
+      ? true
+      : rawSettings.acceptingResponses;
+  if (typeof acceptingResponses !== "boolean") {
+    return { error: "settings.acceptingResponses must be a boolean" };
+  }
+
   return {
     settings: {
       timezone,
       durationMinutes,
       schedulingWindows,
-      responseWindow: {
-        opensAt: responseWindow.opensAt ?? null,
-        closesAt: responseWindow.closesAt ?? null,
-      },
       allowResponseEdits,
       resultsVisibleToParticipants,
+      acceptingResponses,
     },
   };
 }
@@ -158,7 +130,8 @@ export function parseStoredSettings(raw) {
 
 export function publicSettings(stored) {
   if (!stored || typeof stored !== "object") return {};
-  const { description: _description, ...settings } = stored;
+  const { description: _description, responseWindow: _responseWindow, ...settings } =
+    stored;
   return settings;
 }
 
