@@ -338,6 +338,64 @@
   color: var(--color-error);
 }
 
+.calendar-manual {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-md);
+}
+
+.calendar-manual > .text-sub {
+  margin: var(--space-xs) 0 var(--space-md);
+}
+
+.calendar-manual-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: flex-end;
+}
+
+.calendar-manual-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1 1 180px;
+  min-width: 0;
+  margin: 0;
+}
+
+.calendar-manual-field span {
+  font-size: var(--text-size-small);
+  color: var(--text-muted);
+}
+
+.calendar-manual-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--button-border-radius);
+  background: var(--surface-card);
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-manual-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: var(--focus-ring);
+}
+
+.calendar-manual-add {
+  flex: 1 1 100%;
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.calendar-manual-error {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-error);
+}
+
 @media (max-width: 560px) {
   .calendar-layout {
     flex-direction: column;

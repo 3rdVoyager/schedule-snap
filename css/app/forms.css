@@ -36,7 +36,7 @@ main form label:not(.calendar-range-preference) {
   margin-bottom: var(--space-sm);
 }
 
-main form input:not([type="checkbox"]):not([type="radio"]):not(.calendar-range-preference-input),
+main form input:not([type="checkbox"]):not([type="radio"]):not(.calendar-range-preference-input):not(.calendar-manual-input),
 main form select,
 main form textarea {
   width: 100%;

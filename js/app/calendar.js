@@ -1,4 +1,5 @@
 import {
+  addDaysToDateKey,
   dateKeyInZone,
   formatInZone,
   formatMinutesLabel,
@@ -6,6 +7,8 @@ import {
   intersectWindowWithDay,
   isDayInSchedulingWindows,
   rangeFromDayMinutes,
+  utcToDatetimeLocal,
+  zonedToUtcIso,
 } from "./time.js";
 
 const SLOT_MINUTES = 15;
@@ -45,6 +48,9 @@ export function createCalendar(container, options) {
   let dragEndSlot = null;
   let isDragging = false;
   let lastRenderedDay = null;
+  let manualStartValue = "";
+  let manualEndValue = "";
+  let manualEntryError = "";
 
   const root = document.createElement("div");
   root.className = "calendar";
@@ -146,8 +152,85 @@ export function createCalendar(container, options) {
     return new Date(year, month + 1, 0).getDate();
   }
 
+  function rangeOverlapsDay(range, dayKeyStr) {
+    const dayStartMs = new Date(
+      zonedToUtcIso(`${dayKeyStr}T00:00`, timezone),
+    ).getTime();
+    const dayEndMs = new Date(
+      zonedToUtcIso(`${addDaysToDateKey(dayKeyStr, 1, timezone)}T00:00`, timezone),
+    ).getTime();
+    const rangeStart = new Date(range.start).getTime();
+    const rangeEnd = new Date(range.end).getTime();
+    return rangeStart < dayEndMs && rangeEnd > dayStartMs;
+  }
+
   function rangesOnDay(dayKeyStr) {
-    return ranges.filter((r) => dateKeyInZone(r.start, timezone) === dayKeyStr);
+    return ranges.filter((range) => rangeOverlapsDay(range, dayKeyStr));
+  }
+
+  function isRangeInsideWindow(range, window) {
+    const rangeStart = new Date(range.start).getTime();
+    const rangeEnd = new Date(range.end).getTime();
+    const windowStart = new Date(window.start).getTime();
+    const windowEnd = new Date(window.end).getTime();
+    if (
+      Number.isNaN(rangeStart) ||
+      Number.isNaN(rangeEnd) ||
+      Number.isNaN(windowStart) ||
+      Number.isNaN(windowEnd)
+    ) {
+      return false;
+    }
+    return rangeStart >= windowStart && rangeEnd <= windowEnd;
+  }
+
+  function initManualDefaults() {
+    if (manualStartValue && manualEndValue) return;
+
+    if (schedulingWindows.length > 0) {
+      manualStartValue = utcToDatetimeLocal(schedulingWindows[0].start, timezone);
+      manualEndValue = utcToDatetimeLocal(schedulingWindows[0].end, timezone);
+      return;
+    }
+
+    const today = dateKeyInZone(new Date().toISOString(), timezone);
+    manualStartValue = `${today}T09:00`;
+    manualEndValue = `${today}T17:00`;
+  }
+
+  function addManualRange(startNaive, endNaive) {
+    if (!startNaive || !endNaive) {
+      return "Start and end are required.";
+    }
+
+    const range = {
+      start: zonedToUtcIso(startNaive, timezone),
+      end: zonedToUtcIso(endNaive, timezone),
+    };
+
+    if (new Date(range.end) <= new Date(range.start)) {
+      return "End must be after start.";
+    }
+
+    if (mode === "availability") {
+      const inside = schedulingWindows.some((window) =>
+        isRangeInsideWindow(range, window),
+      );
+      if (!inside) {
+        return "This range must fall within an allowed scheduling window.";
+      }
+    }
+
+    const key = rangeKey(range);
+    if (ranges.some((existing) => rangeKey(existing) === key)) {
+      return "This time range is already added.";
+    }
+
+    ranges = [...ranges, range].sort(
+      (a, b) => new Date(a.start) - new Date(b.start),
+    );
+    syncPreferences();
+    return "";
   }
 
   function segmentEndMinutes(segment) {
@@ -384,6 +467,10 @@ export function createCalendar(container, options) {
     }
 
     root.appendChild(layout);
+    if (!isReadOnly) {
+      initManualDefaults();
+      root.appendChild(buildManualEntrySection());
+    }
     renderAllRangesList();
 
     const timeGrid = root.querySelector(".calendar-time-grid");
@@ -538,6 +625,81 @@ export function createCalendar(container, options) {
     return panel;
   }
 
+  function buildManualEntrySection() {
+    const section = document.createElement("div");
+    section.className = "calendar-manual";
+
+    const heading = document.createElement("p");
+    heading.className = "text-body-sm text-semibold";
+    heading.textContent = "Add time manually";
+    section.appendChild(heading);
+
+    const hint = document.createElement("p");
+    hint.className = "text-sub";
+    hint.textContent =
+      mode === "scheduling"
+        ? "For longer windows, pick a start and end instead of using the day grid."
+        : "For longer periods, pick a start and end instead of using the day grid.";
+    section.appendChild(hint);
+
+    const row = document.createElement("div");
+    row.className = "calendar-manual-row";
+
+    const startField = document.createElement("label");
+    startField.className = "calendar-manual-field";
+    const startLabel = document.createElement("span");
+    startLabel.textContent = "Start";
+    const startInput = document.createElement("input");
+    startInput.type = "datetime-local";
+    startInput.className = "calendar-manual-input";
+    startInput.value = manualStartValue;
+    startInput.addEventListener("input", () => {
+      manualStartValue = startInput.value;
+      manualEntryError = "";
+    });
+    startField.append(startLabel, startInput);
+
+    const endField = document.createElement("label");
+    endField.className = "calendar-manual-field";
+    const endLabel = document.createElement("span");
+    endLabel.textContent = "End";
+    const endInput = document.createElement("input");
+    endInput.type = "datetime-local";
+    endInput.className = "calendar-manual-input";
+    endInput.value = manualEndValue;
+    endInput.addEventListener("input", () => {
+      manualEndValue = endInput.value;
+      manualEntryError = "";
+    });
+    endField.append(endLabel, endInput);
+
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "button button-secondary-outline calendar-manual-add";
+    addBtn.textContent = "Add time";
+    addBtn.addEventListener("click", () => {
+      manualStartValue = startInput.value;
+      manualEndValue = endInput.value;
+      manualEntryError = addManualRange(manualStartValue, manualEndValue);
+      if (!manualEntryError) {
+        notifyChange();
+      }
+      render();
+    });
+
+    row.append(startField, endField, addBtn);
+    section.appendChild(row);
+
+    if (manualEntryError) {
+      const error = document.createElement("p");
+      error.className = "calendar-manual-error text-body-sm";
+      error.textContent = manualEntryError;
+      section.appendChild(error);
+    }
+
+    return section;
+  }
+
   function renderAllRangesList() {
     if (ranges.length === 0) return;
 
@@ -686,6 +848,9 @@ export function createCalendar(container, options) {
     },
     setTimezone(nextTimezone) {
       timezone = nextTimezone;
+      manualStartValue = "";
+      manualEndValue = "";
+      manualEntryError = "";
       render();
     },
     destroy() {
