@@ -50,6 +50,112 @@ export function isInsideWindow(range, window) {
   return rangeStart >= windowStart && rangeEnd <= windowEnd;
 }
 
+function normalizeRanges(ranges) {
+  return [...ranges]
+    .map((range) => ({ start: range.start, end: range.end }))
+    .sort(
+      (a, b) =>
+        a.start.localeCompare(b.start) || a.end.localeCompare(b.end),
+    );
+}
+
+export function intersectTimeRange(range, window) {
+  const rangeStart = parseUtcInstant(range.start);
+  const rangeEnd = parseUtcInstant(range.end);
+  const windowStart = parseUtcInstant(window.start);
+  const windowEnd = parseUtcInstant(window.end);
+  if (!rangeStart || !rangeEnd || !windowStart || !windowEnd) return null;
+
+  const startMs = Math.max(rangeStart, windowStart);
+  const endMs = Math.min(rangeEnd, windowEnd);
+  if (endMs <= startMs) return null;
+
+  return {
+    start: new Date(startMs).toISOString(),
+    end: new Date(endMs).toISOString(),
+  };
+}
+
+export function clipAvailabilityToWindows(
+  availability,
+  preferences,
+  schedulingWindows,
+) {
+  const clippedAvailability = [];
+  const clippedPreferences = {};
+  const prefs = preferences ?? {};
+
+  for (const range of availability) {
+    const sourcePreference = prefs[availabilityKey(range)] ?? 3;
+
+    for (const window of schedulingWindows) {
+      const part = intersectTimeRange(range, window);
+      if (!part) continue;
+
+      const key = availabilityKey(part);
+      if (
+        clippedAvailability.some((existing) => availabilityKey(existing) === key)
+      ) {
+        continue;
+      }
+
+      clippedAvailability.push(part);
+      clippedPreferences[key] = sourcePreference;
+    }
+  }
+
+  clippedAvailability.sort((a, b) => a.start.localeCompare(b.start));
+
+  return {
+    availability: clippedAvailability,
+    preferences:
+      clippedAvailability.length > 0 ? clippedPreferences : null,
+  };
+}
+
+export function schedulingWindowsChanged(previousWindows, nextWindows) {
+  return (
+    JSON.stringify(normalizeRanges(previousWindows ?? [])) !==
+    JSON.stringify(normalizeRanges(nextWindows ?? []))
+  );
+}
+
+export async function clipEventResponsesToWindows(
+  env,
+  eventId,
+  schedulingWindows,
+) {
+  const rows = await fetchEventResponses(env, eventId);
+  const now = new Date().toISOString();
+  let clippedCount = 0;
+
+  for (const row of rows.results ?? []) {
+    const parsed = parseResponseRow(row);
+    const { availability, preferences } = clipAvailabilityToWindows(
+      parsed.availability,
+      parsed.preferences,
+      schedulingWindows,
+    );
+
+    const before = JSON.stringify(normalizeRanges(parsed.availability));
+    const after = JSON.stringify(normalizeRanges(availability));
+    if (before === after) continue;
+
+    const preferencesJson =
+      preferences === null ? null : JSON.stringify(preferences);
+
+    await env.DB.prepare(
+      "UPDATE responses SET availability = ?, preferences = ?, updated_at = ? WHERE id = ?",
+    )
+      .bind(JSON.stringify(availability), preferencesJson, now, row.id)
+      .run();
+
+    clippedCount += 1;
+  }
+
+  return clippedCount;
+}
+
 export function validateSettings(rawSettings) {
   if (!rawSettings || typeof rawSettings !== "object") {
     return { error: "settings is required" };

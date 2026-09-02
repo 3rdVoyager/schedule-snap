@@ -16,6 +16,10 @@ import {
   computeRecommendations,
   renderRecommendationsList,
 } from "./recommendations.js";
+import {
+  countResponsesNeedingClip,
+  schedulingWindowsChanged,
+} from "./scheduling-windows.js";
 import { showToast } from "./toast.js";
 
 const view = document.querySelector("#manage-view");
@@ -230,6 +234,27 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const previousWindows = currentEventData?.settings?.schedulingWindows ?? [];
+  const windowsChanged = schedulingWindowsChanged(
+    previousWindows,
+    schedulingWindows,
+  );
+  let responsesToClip = 0;
+
+  if (windowsChanged && currentEventData?.responses?.length) {
+    responsesToClip = countResponsesNeedingClip(
+      currentEventData.responses,
+      schedulingWindows,
+    );
+    if (responsesToClip > 0) {
+      const noun = responsesToClip === 1 ? "response has" : "responses have";
+      const confirmed = confirm(
+        `${responsesToClip} participant ${noun} availability outside the new scheduling windows. Saving will trim those times to fit. Continue?`,
+      );
+      if (!confirmed) return;
+    }
+  }
+
   const payload = {
     title: document.querySelector("#title").value.trim(),
     description: document.querySelector("#description").value.trim(),
@@ -264,7 +289,14 @@ form.addEventListener("submit", async (event) => {
     populateForm(data);
     renderResponses(data);
     renderRecommendations();
-    showToast("Changes saved");
+    if (data.clippedResponseCount > 0) {
+      const noun = data.clippedResponseCount === 1 ? "response" : "responses";
+      showToast(
+        `Changes saved. Trimmed availability for ${data.clippedResponseCount} ${noun}.`,
+      );
+    } else {
+      showToast("Changes saved");
+    }
   } catch {
     showToast("Could not reach the server", { type: "error" });
   }

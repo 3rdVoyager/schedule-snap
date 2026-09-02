@@ -15,7 +15,7 @@ Auth header: `Authorization: Bearer {type}:{value}` — types `event` (8 digits)
 | `GET` | `/api/events/view` | `event:` | Event + `responses[]`; **403** unless sharing enabled |
 | `GET` | `/api/events/view` | `manage:` | Event + `responses[]` (organizer) |
 | `GET` | `/api/events/manage` | `manage:` | Event + `responses[]` |
-| `PATCH` | `/api/events/manage` | `manage:` | Body same as create; returns event + `responses[]` |
+| `PATCH` | `/api/events/manage` | `manage:` | Body same as create; returns event + `responses[]`; may include `clippedResponseCount` when scheduling windows change |
 | `PATCH` | `/api/events/manage/responses/:id` | `manage:` | Body `{ critical: boolean }`; returns event + `responses[]` |
 | `DELETE` | `/api/events/manage` | `manage:` | Deletes event and all responses |
 

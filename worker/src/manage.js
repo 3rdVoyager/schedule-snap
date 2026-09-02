@@ -1,8 +1,11 @@
 import {
   buildManageEventPayload,
+  clipEventResponsesToWindows,
   fetchEventResponses,
   getEventByManageToken,
   json,
+  parseStoredSettings,
+  schedulingWindowsChanged,
   validateSettings,
 } from "./lib.js";
 
@@ -44,6 +47,11 @@ export async function updateManageEvent(request, env, manageToken) {
     return json({ error: validated.error }, 400);
   }
 
+  const stored = parseStoredSettings(event.settings) ?? {};
+  const previousWindows = stored.schedulingWindows ?? [];
+  const nextWindows = validated.settings.schedulingWindows;
+  const windowsChanged = schedulingWindowsChanged(previousWindows, nextWindows);
+
   const settingsToStore = JSON.stringify({
     description,
     ...validated.settings,
@@ -57,9 +65,21 @@ export async function updateManageEvent(request, env, manageToken) {
     .bind(title, settingsToStore, now, event.id)
     .run();
 
+  let clippedResponseCount = 0;
+  if (windowsChanged) {
+    clippedResponseCount = await clipEventResponsesToWindows(
+      env,
+      event.id,
+      nextWindows,
+    );
+  }
+
   const updated = await getEventByManageToken(env, manageToken);
   const rows = await fetchEventResponses(env, event.id);
-  return json(buildManageEventPayload(updated, rows));
+  return json({
+    ...buildManageEventPayload(updated, rows),
+    clippedResponseCount,
+  });
 }
 
 export async function deleteManageEvent(env, manageToken) {
