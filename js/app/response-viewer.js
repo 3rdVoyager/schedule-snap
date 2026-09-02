@@ -7,9 +7,11 @@ import { createCalendar } from "./calendar.js";
  *   nameElement: HTMLElement,
  *   calendarMount: HTMLElement,
  * }} elements
+ * @param {{ showCritical?: boolean, onCriticalChange?: (responseId: string, critical: boolean) => void }} [options]
  */
-export function createResponseListController(elements) {
+export function createResponseListController(elements, options = {}) {
   const { listElement, viewerElement, nameElement, calendarMount } = elements;
+  const { showCritical = false, onCriticalChange } = options;
   let calendar = null;
   let eventContext = null;
   let selectedId = "";
@@ -49,7 +51,7 @@ export function createResponseListController(elements) {
   }
 
   /**
-   * @param {{ id: string, displayName: string, availability?: { start: string, end: string }[] }[]} responses
+   * @param {{ id: string, displayName: string, critical?: boolean, availability?: { start: string, end: string }[] }[]} responses
    * @param {{ timezone: string, schedulingWindows?: { start: string, end: string }[] }} settings
    */
   function render(responses, settings) {
@@ -62,10 +64,41 @@ export function createResponseListController(elements) {
 
     for (const response of responses) {
       const li = document.createElement("li");
-      li.className =
-        "app-list-item app-list-item--selectable text-body-sm text-medium";
+      li.className = "app-list-item app-list-item--selectable";
       li.dataset.responseId = response.id;
-      li.textContent = response.displayName;
+
+      const name = document.createElement("span");
+      name.className = "response-list-name text-body-sm text-medium";
+      name.textContent = response.displayName;
+      li.appendChild(name);
+
+      if (showCritical) {
+        const criticalLabel = document.createElement("label");
+        criticalLabel.className = "response-critical";
+        criticalLabel.addEventListener("click", (event) => {
+          event.stopPropagation();
+        });
+
+        const criticalText = document.createElement("span");
+        criticalText.className = "response-critical-text text-body-sm text-medium";
+        criticalText.textContent = "Critical";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "response-critical-input";
+        checkbox.checked = response.critical === true;
+        checkbox.addEventListener("change", () => {
+          onCriticalChange?.(response.id, checkbox.checked);
+        });
+
+        const switchEl = document.createElement("span");
+        switchEl.className = "response-critical-switch";
+        switchEl.setAttribute("aria-hidden", "true");
+
+        criticalLabel.append(criticalText, checkbox, switchEl);
+        li.appendChild(criticalLabel);
+      }
+
       li.addEventListener("click", () => showResponse(response));
       listElement.appendChild(li);
     }

@@ -11,8 +11,11 @@ import {
 } from "./session.js";
 import { populatePageHeader } from "./page-header.js";
 import { createResponseListController } from "./response-viewer.js";
+import {
+  computeRecommendations,
+  renderRecommendationsList,
+} from "./recommendations.js";
 import { showToast } from "./toast.js";
-import { formatInZone } from "./time.js";
 
 const article = document.querySelector("#view-article");
 
@@ -89,32 +92,13 @@ function renderView(data) {
 
   populatePageHeader(document.querySelector("#page-header"), data);
 
-  const recList = document.querySelector("#recommendations-list");
-  const recEmpty = document.querySelector("#recommendations-empty");
-  recList.replaceChildren();
-
-  if (data.recommendations.length === 0) {
-    recList.hidden = true;
-    recEmpty.hidden = false;
-  } else {
-    recEmpty.hidden = true;
-    recList.hidden = false;
-    for (const rec of data.recommendations) {
-      const li = document.createElement("li");
-      li.className = "app-list-item";
-
-      const time = document.createElement("span");
-      time.className = "text-body-sm text-medium";
-      time.textContent = `${formatInZone(rec.start, timezone)} – ${formatInZone(rec.end, timezone)}`;
-
-      const meta = document.createElement("span");
-      meta.className = "text-sub";
-      meta.textContent = `${rec.availableCount} of ${rec.totalResponses} available`;
-
-      li.append(time, meta);
-      recList.appendChild(li);
-    }
-  }
+  const recommendations = computeRecommendations(data.settings, data.responses);
+  renderRecommendationsList(
+    document.querySelector("#recommendations-list"),
+    document.querySelector("#recommendations-empty"),
+    recommendations,
+    timezone,
+  );
 
   const resList = document.querySelector("#responses-list");
   const resEmpty = document.querySelector("#responses-empty");

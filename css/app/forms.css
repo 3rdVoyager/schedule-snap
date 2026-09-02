@@ -102,6 +102,76 @@ main form .form-field-checkbox input {
   width: auto;
 }
 
+main form .form-field-radio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+main form .form-field-radio label,
+.recommendations-scoring .form-field-radio label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+main form .form-field-radio input,
+.recommendations-scoring .form-field-radio input {
+  width: auto;
+  margin: 0;
+}
+
+.recommendations-scoring {
+  border: none;
+  margin: 0 0 var(--space-md);
+  padding: 0;
+}
+
+.recommendations-scoring > .text-sub {
+  margin: 0 0 var(--space-md);
+}
+
+.recommendations-scoring legend {
+  margin-bottom: var(--space-sm);
+  padding: 0;
+}
+
+.recommendations-weight {
+  margin-bottom: var(--space-md);
+}
+
+.recommendations-weight:last-child {
+  margin-bottom: 0;
+}
+
+.recommendations-balance-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.recommendations-balance-readout {
+  margin: var(--space-xs) 0 0;
+  text-align: center;
+}
+
+.recommendations-weight-input {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--primary-color);
+}
+
+main .card-normal .recommendations-weight-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
 main article > section {
   margin-bottom: var(--space-xl);
 }

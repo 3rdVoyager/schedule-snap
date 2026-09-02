@@ -1,7 +1,7 @@
 import { parseBearerAuth, requireBearerType } from "./auth.js";
 import { createEvent } from "./create.js";
 import { corsHeaders, json } from "./lib.js";
-import { getManageEvent, updateManageEvent, deleteManageEvent } from "./manage.js";
+import { getManageEvent, updateManageEvent, deleteManageEvent, updateResponseCritical } from "./manage.js";
 import {
   getEventByCode,
   getResponseForEdit,
@@ -13,7 +13,17 @@ import { getOrganizerView, getParticipantView } from "./view.js";
 
 export default {
   async fetch(request, env) {
-    const segments = new URL(request.url).pathname.split("/");
+    try {
+      return await handleRequest(request, env);
+    } catch (err) {
+      console.error(err);
+      return json({ error: "Internal server error" }, 500);
+    }
+  },
+};
+
+async function handleRequest(request, env) {
+  const segments = new URL(request.url).pathname.split("/");
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
@@ -99,6 +109,21 @@ export default {
       return json({ error: "Authorization required" }, 401);
     }
 
+    // PATCH /api/events/manage/responses/:responseId
+    if (
+      segments[1] === "api" &&
+      segments[2] === "events" &&
+      segments[3] === "manage" &&
+      segments[4] === "responses" &&
+      segments[5] &&
+      !segments[6] &&
+      request.method === "PATCH"
+    ) {
+      const auth = requireBearerType(request, "manage");
+      if (auth.error) return auth.error;
+      return updateResponseCritical(request, env, auth.value, segments[5]);
+    }
+
     // GET /api/events/manage
     if (
       segments[1] === "api" &&
@@ -139,5 +164,4 @@ export default {
     }
 
     return json({ message: "Not found" }, 404);
-  },
-};
+}

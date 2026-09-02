@@ -1,6 +1,7 @@
 import { generateHexToken } from "./auth.js";
 import {
   getResponseWithEventByEditToken,
+  isDisplayNameTaken,
   isInsideWindow,
   json,
   parseResponseRow,
@@ -77,6 +78,13 @@ export async function updateResponse(request, env, editToken) {
     return json({ error: "displayName is required" }, 400);
   }
 
+  if (await isDisplayNameTaken(env, row.event_id, displayName, row.id)) {
+    return json(
+      { error: "This display name is already taken for this event" },
+      409,
+    );
+  }
+
   const availability = body.availability;
   if (!Array.isArray(availability)) {
     return json({ error: "availability must be an array" }, 400);
@@ -146,6 +154,13 @@ export async function submitResponse(request, env, eventCode) {
     typeof body.displayName === "string" ? body.displayName.trim() : "";
   if (displayName.length === 0) {
     return json({ error: "displayName is required" }, 400);
+  }
+
+  if (await isDisplayNameTaken(env, event.id, displayName)) {
+    return json(
+      { error: "This display name is already taken for this event" },
+      409,
+    );
   }
 
   const availability = body.availability;

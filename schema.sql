@@ -18,6 +18,7 @@ CREATE TABLE responses (
   edit_token    TEXT UNIQUE NOT NULL, -- 32 hex chars, grants edit for this response only
   display_name  TEXT NOT NULL,
   role          TEXT,                 -- optional, for weighted scheduling
+  critical      INTEGER NOT NULL DEFAULT 0, -- 1 = must attend for recommended slots
   availability  TEXT NOT NULL,        -- JSON: ranges or slot map
   preferences   TEXT,                 -- JSON: slot -> preference score
   created_at    TEXT NOT NULL,

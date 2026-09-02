@@ -155,6 +155,8 @@ function availabilityKey(range) {
   return `${range.start}|${range.end}`;
 }
 
+export { availabilityKey };
+
 export function validatePreferences(raw, availability) {
   if (raw === null || raw === undefined) {
     if (availability.length === 0) {
@@ -237,6 +239,7 @@ export function parseResponseRow(row) {
     id: row.id,
     displayName: row.display_name,
     role: row.role,
+    critical: row.critical === 1,
     availability,
     preferences,
     createdAt: row.created_at,
@@ -267,18 +270,35 @@ export async function fetchEventResponses(env, eventId) {
     .all();
 }
 
+export async function isDisplayNameTaken(
+  env,
+  eventId,
+  displayName,
+  excludeResponseId = null,
+) {
+  const row = excludeResponseId
+    ? await env.DB.prepare(
+        "SELECT 1 FROM responses WHERE event_id = ? AND display_name = ? AND id != ? LIMIT 1",
+      )
+        .bind(eventId, displayName, excludeResponseId)
+        .first()
+    : await env.DB.prepare(
+        "SELECT 1 FROM responses WHERE event_id = ? AND display_name = ? LIMIT 1",
+      )
+        .bind(eventId, displayName)
+        .first();
+  return row !== null;
+}
+
 export function parseViewResponses(rows) {
   return (rows.results ?? []).map((row) => {
-    let availability = [];
-    try {
-      availability = JSON.parse(row.availability);
-    } catch {
-      availability = [];
-    }
+    const parsed = parseResponseRow(row);
     return {
-      id: row.id,
-      displayName: row.display_name,
-      availability,
+      id: parsed.id,
+      displayName: parsed.displayName,
+      availability: parsed.availability,
+      preferences: parsed.preferences,
+      critical: parsed.critical,
     };
   });
 }
