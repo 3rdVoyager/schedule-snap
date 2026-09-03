@@ -27,6 +27,8 @@ header.innerHTML = `
             <li><a href="/" class="button button-primary-outline button-small nav-link">Home</a></li>
             <li><a href="/how-it-works/" class="button button-primary-outline button-small nav-link">How It Works</a></li>
             <li><a href="/features/" class="button button-primary-outline button-small nav-link">Features</a></li>
+            <li><a href="/use-cases/" class="button button-primary-outline button-small nav-link">Use Cases</a></li>
+            <li><a href="/faq/" class="button button-primary-outline button-small nav-link">FAQ</a></li>
             <li><a href="/app/" class="button button-primary button-small nav-cta">Open App</a></li>
         </ul>
         </div>
@@ -106,6 +108,7 @@ footer.innerHTML = `
                 <ul>
                     <li><a href="/how-it-works/">How It Works</a></li>
                     <li><a href="/features/">Features</a></li>
+                    <li><a href="/use-cases/">Use Cases</a></li>
                     <li><a href="/features/#compare">Compare</a></li>
                 </ul>
             </div>
@@ -115,6 +118,23 @@ footer.innerHTML = `
                 <ul>
                     <li><a href="/app/">Open App</a></li>
                     <li><a href="/app/create/">Create an event</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>About</h3>
+                <ul>
+                    <li><a href="/about/">About ScheduleSnap</a></li>
+                    <li><a href="/faq/">FAQ</a></li>
+                    <li>
+                        <a
+                            href="https://github.com/3rdVoyager/schedule-snap"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            >GitHub</a
+                        >
+                    </li>
+                    <li><a href="mailto:joshuacheng.dev@gmail.com">Contact</a></li>
                 </ul>
             </div>
         </div>

@@ -133,7 +133,7 @@ footer {
 
 .footer-columns {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
   gap: 2.5rem 3rem;
   align-items: start;
   padding-bottom: 2.5rem;
@@ -263,6 +263,16 @@ footer {
     margin-top: 0.15rem;
     padding-top: 0.35rem;
     border-top: var(--border-width-thin) solid var(--site-line-color);
+  }
+}
+
+@media (max-width: 1100px) {
+  .footer-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-columns > .footer-column:first-child {
+    grid-column: 1 / -1;
   }
 }
 
