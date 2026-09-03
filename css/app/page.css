@@ -190,7 +190,7 @@
 
 .empty-state {
   padding: var(--space-lg);
-  border-radius: var(--button-border-radius);
+  border-radius: 10px;
   background: var(--surface-page);
 }
 
@@ -218,8 +218,8 @@ main .card-normal textarea {
   width: 100%;
   max-width: 100%;
   padding: 10px 12px;
-  border: var(--button-border-width) solid var(--card-border);
-  border-radius: var(--button-border-radius);
+  border: var(--border-width-thin) solid var(--card-border);
+  border-radius: 10px;
   background: var(--surface-card);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

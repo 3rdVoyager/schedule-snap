@@ -77,7 +77,7 @@
 .card-normal > .app-list,
 .card-normal > .app-list--bordered {
   border: var(--border-width-thin) solid var(--card-border);
-  border-radius: var(--button-border-radius);
+  border-radius: 10px;
   background: var(--surface-card);
   overflow: hidden;
 }

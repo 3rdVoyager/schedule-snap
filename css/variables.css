@@ -63,19 +63,6 @@
     --border-width-thin: 2px;
     --border-width-thick: 3px;
 
-    /* Buttons */
-    --button-border-radius: 10px;
-    --button-radius: var(--button-border-radius);
-    --button-border-width: 2px;
-    --button-text-color: #ffffff;
-    --outline-button-text-color: var(--text-color-dark);
-    --secondary-button-color: transparent;
-    --secondary-button-border-color: var(--secondary-color-hover);
-    --secondary-button-color-hover: color-mix(in srgb, var(--secondary-color) 28%, transparent);
-    --tertiary-button-color: transparent;
-    --tertiary-button-border-color: var(--primary-color-hover);
-    --tertiary-button-color-hover: color-mix(in srgb, var(--primary-color) 12%, white);
-
     /* Chrome (header/footer — shared by app + site) */
     --header-bg-color: color-mix(in srgb, var(--primary-color-light) 72%, white);
     --footer-bg-color: color-mix(in srgb, var(--primary-color-light) 55%, white);

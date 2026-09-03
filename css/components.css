@@ -234,7 +234,7 @@
   padding: var(--space-sm) var(--space-md);
   background-color: var(--card-bg);
   border: var(--border-width-thin) solid var(--card-border);
-  border-radius: var(--button-radius);
+  border-radius: 10px;
   box-shadow: var(--shadow-sm);
   transition:
     box-shadow var(--transition-fast),
@@ -294,7 +294,7 @@
   padding: var(--space-sm);
   background-color: var(--card-bg);
   border: var(--border-width-thin) solid var(--card-border);
-  border-radius: var(--button-radius);
+  border-radius: 10px;
   box-shadow: var(--shadow-sm);
   vertical-align: middle;
   color: var(--text-color-muted);
